@@ -1,0 +1,27 @@
+# Cloudflare Pages headers.
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://connect.facebook.net https://mc.yandex.ru https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com https://www.facebook.com https://mc.yandex.ru https://www.google-analytics.com; font-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; connect-src 'self' https://mc.yandex.ru https://www.google-analytics.com https://region1.google-analytics.com; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests
+
+# Fingerprint-free filenames, so cache conservatively but still long enough
+# to matter on repeat visits. Bump via a deploy when an asset changes.
+/assets/img/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/css/*
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/assets/js/*
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/api/*
+  Cache-Control: no-store

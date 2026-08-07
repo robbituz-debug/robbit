@@ -1,0 +1,8 @@
+# Copy to .dev.vars for `wrangler pages dev`. Never commit the real file.
+# In production set these in Cloudflare Pages -> Settings -> Environment variables.
+
+TELEGRAM_BOT_TOKEN=123456789:AAExampleTokenFromBotFather
+TELEGRAM_CHAT_ID=-1001234567890
+
+# Optional: comma-separated extra origins allowed to POST /api/lead
+# ALLOWED_ORIGIN=https://robbit.uz,https://www.robbit.uz

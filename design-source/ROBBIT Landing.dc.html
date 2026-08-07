@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./image-slot.js"></script>
+<style>
+  @font-face { font-family: 'Plus Jakarta Sans'; src: url('./assets/fonts/PlusJakartaSans.ttf') format('truetype-variations'); font-weight: 200 900; font-style: normal; font-display: swap; }
+  html, body { margin: 0; padding: 0; background: #EAF7FF; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: #302763; text-decoration: none; }
+  a:hover { color: #5151FF; }
+  input, button { font-family: inherit; }
+  input:focus { outline: none; }
+  @keyframes robbitFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  @keyframes auroraA { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(6%,4%,0) scale(1.12); } }
+  @keyframes auroraB { 0%,100% { transform: translate3d(0,0,0) scale(1.05); } 50% { transform: translate3d(-7%,-5%,0) scale(0.95); } }
+  @keyframes auroraC { 0%,100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(4%,-6%,0) scale(1.1); } }
+  @keyframes glassRise { from { opacity: 0; transform: translateY(28px) scale(0.985); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
+  @keyframes shimmer { 0% { transform: translateX(-120%) skewX(-18deg); } 55%, 100% { transform: translateX(320%) skewX(-18deg); } }
+  @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(60,140,255,0.55); } 50% { box-shadow: 0 0 0 10px rgba(60,140,255,0); } }
+  .rise { animation: glassRise .9s cubic-bezier(.2,.9,.25,1) both; }
+  .lift { transition: transform .45s cubic-bezier(.2,.9,.25,1), box-shadow .45s cubic-bezier(.2,.9,.25,1); }
+  .lift:hover { transform: translateY(-8px); }
+  @media (prefers-reduced-motion: reduce) { .rise { animation: none; } * { animation-duration: .001s !important; } }
+  .phone-full { display: inline; }
+  .phone-short { display: none; }
+  .hdr-tel { display: inline-block; }
+  .hdr-cta-mob { display: none; }
+  .mob-only { display: none !important; }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+  @media (max-width: 720px) {
+    .phone-full { display: none; }
+    .phone-short { display: inline; }
+    .hdr { flex-wrap: nowrap !important; padding: 10px 10px 10px 16px !important; gap: 10px !important; }
+    .hdr img { width: 100px !important; }
+    .hdr-cta { display: none !important; }
+    .hdr-tel { display: none !important; }
+    .hdr-cta-mob { display: inline-block !important; padding: 12px 20px !important; font-size: 15px !important; }
+    .mob-only { display: flex !important; }
+    .quiz-shell { display: none; }
+    .quiz-shell.open { display: block; position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 70; width: 100%; max-height: 92vh; overflow-y: auto; border-radius: 30px 30px 0 0 !important; animation: sheetUp .4s cubic-bezier(.2,.9,.25,1) both; }
+    .quiz-backdrop { display: block !important; }
+    .lift:hover { transform: none; }
+  }
+  @media (max-width: 480px) { .hdr img { width: 88px !important; } .hdr-tel { padding: 10px 10px !important; } }
+</style>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#28DDFF"></stop><stop offset="1" stop-color="#5151FF"></stop></linearGradient></defs><rect width="400" height="400" fill="url(#g)"></rect><rect x="120" y="120" width="160" height="160" rx="44" fill="#fff" opacity="0.9"></rect><text x="200" y="232" font-family="system-ui, sans-serif" font-size="86" font-weight="800" fill="#3A2FD1" text-anchor="middle">R</text></svg></template>
+</helmet>
+
+<div style="position:relative;width:100%;background:#EAF7FF;color:#1E1A44;overflow-x:hidden;overflow-y:visible">
+
+  <div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:linear-gradient(165deg,#E6F8FF 0%,#F4FAFF 45%,#EDEEFF 100%)">
+    <div style="position:absolute;top:-14%;left:-8%;width:60vw;height:60vw;border-radius:50%;background:radial-gradient(circle,rgba(31,215,253,0.85) 0%,rgba(31,215,253,0) 66%);filter:blur(30px);animation:auroraA 22s ease-in-out infinite"></div>
+    <div style="position:absolute;top:22%;right:-14%;width:56vw;height:56vw;border-radius:50%;background:radial-gradient(circle,rgba(81,81,255,0.6) 0%,rgba(81,81,255,0) 68%);filter:blur(34px);animation:auroraB 26s ease-in-out infinite"></div>
+    <div style="position:absolute;bottom:-18%;left:22%;width:52vw;height:52vw;border-radius:50%;background:radial-gradient(circle,rgba(0,194,245,0.55) 0%,rgba(0,194,245,0) 66%);filter:blur(36px);animation:auroraC 30s ease-in-out infinite"></div>
+    <img src="./assets/robbit-ribbon.svg" alt="" style="position:absolute;top:6%;right:-18%;width:1100px;opacity:0.28;filter:blur(0.4px)">
+  </div>
+
+  <div style="position:relative;z-index:1">
+
+    <div style="position:sticky;top:0;z-index:40;padding:14px clamp(12px,3vw,28px) 0">
+      <header style="max-width:1180px;margin:0 auto;padding:12px 14px 12px 20px;border-radius:999px;background:linear-gradient(140deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.45) 100%);backdrop-filter:blur(26px) saturate(190%);-webkit-backdrop-filter:blur(26px) saturate(190%);border:1px solid rgba(255,255,255,0.85);box-shadow:inset 0 1px 1px rgba(255,255,255,0.95),inset 0 -1px 2px rgba(255,255,255,0.4),0 14px 38px rgba(31,80,180,0.16);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap" class="hdr">
+        <a href="#ariza" style="display:block;line-height:0"><img src="./assets/robbit-logo.svg" alt="Robbit" style="width:122px;height:auto;display:block"></a>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap">
+          <a href="tel:+998787773777" class="hdr-tel" style="font-size:15.5px;font-weight:800;color:#25215A;letter-spacing:-0.01em;padding:10px 14px;border-radius:999px;white-space:nowrap" style-hover="color:#5151FF;background:rgba(255,255,255,0.6)"><span class="phone-full">+998 78 777 37 77</span><span class="phone-short">Bog‘lanish</span></a>
+          <a href="tel:+998787773777" class="hdr-cta-mob" style="position:relative;overflow:hidden;padding:13px 24px;border-radius:999px;background:linear-gradient(135deg,#28DDFF 0%,#3C8CFF 50%,#5151FF 100%);color:#FFFFFF;font-size:15px;font-weight:800;white-space:nowrap;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 10px 26px rgba(60,90,255,0.42)" style-hover="color:#FFFFFF">Bog‘lanish</a>
+          <a href="#ariza" class="hdr-cta" style="position:relative;overflow:hidden;padding:13px 24px;border-radius:999px;background:linear-gradient(135deg,#28DDFF 0%,#3C8CFF 50%,#5151FF 100%);color:#FFFFFF;font-size:15px;font-weight:800;white-space:nowrap;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 10px 26px rgba(60,90,255,0.42);transition:box-shadow .4s ease,transform .4s cubic-bezier(.2,.9,.25,1)" style-hover="color:#FFFFFF;transform:translateY(-2px);box-shadow:inset 0 1px 1px rgba(255,255,255,0.75),0 16px 34px rgba(60,90,255,0.6)">
+            Bepul dars
+            <span style="position:absolute;top:0;left:0;width:34%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0.7) 50%,rgba(255,255,255,0) 100%);animation:shimmer 3.6s ease-in-out infinite;pointer-events:none"></span>
+          </a>
+        </div>
+      </header>
+    </div>
+
+    
+
+    <div style="max-width:1200px;margin:0 auto;padding:clamp(28px,5vw,56px) clamp(16px,4vw,32px) clamp(40px,6vw,72px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:clamp(28px,4vw,54px);align-items:center">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:10px;padding:10px 20px;border-radius:999px;background:linear-gradient(140deg,rgba(255,255,255,0.8) 0%,rgba(255,255,255,0.42) 100%);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,0.85);box-shadow:inset 0 1px 1px rgba(255,255,255,0.95),0 8px 24px rgba(31,80,180,0.14);color:#1A4A78;font-size:14px;font-weight:800;margin-bottom:24px">
+          <span style="width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,#28DDFF,#5151FF);box-shadow:0 0 10px rgba(60,140,255,0.9);display:block;animation:pulseGlow 2.4s ease-in-out infinite"></span>
+          8 yil tajriba · 2000+ o‘quvchi
+        </div>
+        <h1 style="margin:0 0 26px;font-size:clamp(32px,4.8vw,58px);line-height:1.06;letter-spacing:-0.035em;font-weight:900;text-transform:uppercase;background-image:linear-gradient(100deg,#0089B8 0%,#0B63D6 42%,#3A2FD1 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 10px rgba(255,255,255,0.85));text-wrap:pretty">Bolalarni kelajak kasblariga tayyorlaymiz</h1>
+        <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:30px">
+          <div class="rise" style="animation-delay:0.27s;display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:999px;background:linear-gradient(140deg,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.34) 100%);backdrop-filter:blur(16px) saturate(170%);-webkit-backdrop-filter:blur(16px) saturate(170%);border:1px solid rgba(255,255,255,0.7);box-shadow:inset 0 1px 1px rgba(255,255,255,0.9);width:100%;max-width:520px">
+            <span style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#28DDFF,#5151FF);color:#FFFFFF;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6)">✓</span>
+            <span style="font-size:16px;font-weight:700;color:#25215A">Birinchi dars — mutlaqo bepul</span>
+          </div>
+          <div class="rise" style="animation-delay:0.39s;display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:999px;background:linear-gradient(140deg,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.34) 100%);backdrop-filter:blur(16px) saturate(170%);-webkit-backdrop-filter:blur(16px) saturate(170%);border:1px solid rgba(255,255,255,0.7);box-shadow:inset 0 1px 1px rgba(255,255,255,0.9);width:100%;max-width:520px">
+            <span style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#28DDFF,#5151FF);color:#FFFFFF;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6)">✓</span>
+            <span style="font-size:16px;font-weight:700;color:#25215A">9–15 yosh uchun amaliy dasturlar</span>
+          </div>
+          <div class="rise" style="animation-delay:0.51s;display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:999px;background:linear-gradient(140deg,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.34) 100%);backdrop-filter:blur(16px) saturate(170%);-webkit-backdrop-filter:blur(16px) saturate(170%);border:1px solid rgba(255,255,255,0.7);box-shadow:inset 0 1px 1px rgba(255,255,255,0.9);width:100%;max-width:520px">
+            <span style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#28DDFF,#5151FF);color:#FFFFFF;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6)">✓</span>
+            <span style="font-size:16px;font-weight:700;color:#25215A">O‘zbekiston bo‘ylab 10 ta filial</span>
+          </div>
+        </div>
+        <button onClick="{{ openSheet }}" class="mob-only" style="display:none;align-items:center;justify-content:center;width:100%;padding:18px 26px;border-radius:999px;border:1px solid rgba(255,255,255,0.6);background:linear-gradient(135deg,#28DDFF 0%,#3C8CFF 52%,#5151FF 100%);color:#FFFFFF;font-size:17px;font-weight:900;cursor:pointer;box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.65),0 14px 34px rgba(60,90,255,0.44)">Ro‘yxatdan o‘tish</button>
+      </div>
+
+      <sc-if value="{{ sheetOpen }}">
+        <div class="quiz-backdrop" onClick="{{ closeSheet }}" style="display:none;position:fixed;inset:0;z-index:69;background:rgba(18,26,64,0.45);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)"></div>
+      </sc-if>
+      <div id="ariza" class="{{ shellClass }}" style="animation-delay:.15s;position:relative;width:100%;border-radius:34px;padding:clamp(22px,4vw,32px) clamp(20px,4vw,30px) 28px;background:linear-gradient(150deg,rgba(255,255,255,0.82) 0%,rgba(255,255,255,0.48) 100%);backdrop-filter:blur(34px) saturate(190%);-webkit-backdrop-filter:blur(34px) saturate(190%);border:1px solid rgba(255,255,255,0.85);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),inset 0 -2px 3px rgba(255,255,255,0.4),0 30px 70px rgba(31,80,180,0.22)">
+        <sc-if value="{{ quizOpen }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ closeSheet }}" class="mob-only" aria-label="Yopish" style="display:none;align-items:center;justify-content:center;width:44px;height:5px;border:none;border-radius:99px;background:rgba(31,80,180,0.28);margin:0 auto 16px;padding:0;cursor:pointer"></button>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:12px">
+            <div style="font-size:21px;font-weight:900;letter-spacing:-0.02em;color:#1E1A44">Bepul sinov darsiga yozilish</div>
+            <div style="font-size:13px;font-weight:800;color:#5151FF;white-space:nowrap">{{ stepLabel }}</div>
+          </div>
+          <div style="height:8px;border-radius:99px;background:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.8);box-shadow:inset 0 1px 2px rgba(31,80,180,0.14);overflow:hidden;margin-bottom:24px">
+            <div style="height:100%;border-radius:99px;background:linear-gradient(90deg,#28DDFF 0%,#5151FF 100%);box-shadow:0 0 14px rgba(60,140,255,0.7);width:{{ progress }};transition:width .4s cubic-bezier(.22,1,.36,1)"></div>
+          </div>
+
+          <sc-if value="{{ isAgeStep }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:17px;font-weight:800;color:#1E1A44;margin-bottom:16px">Farzandingiz necha yoshda?</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ ages }}" as="opt" hint-placeholder-count="3">
+                <sc-if value="{{ opt.on }}">
+                  <button onClick="{{ opt.pick }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:15px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.9);background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);font-size:16px;font-weight:800;color:#FFFFFF;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 10px 26px rgba(60,90,255,0.4)">
+                    <span style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;flex:none"><span style="width:8px;height:8px;border-radius:50%;background:#5151FF;display:block"></span></span>
+                    {{ opt.label }}
+                  </button>
+                </sc-if>
+                <sc-if value="{{ opt.off }}">
+                  <button onClick="{{ opt.pick }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:15px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.8);background:linear-gradient(140deg,rgba(255,255,255,0.66) 0%,rgba(255,255,255,0.3) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:16px;font-weight:700;color:#3B3670;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.9)" style-hover="background:rgba(255,255,255,0.86);box-shadow:inset 0 1px 1px rgba(255,255,255,1),0 8px 22px rgba(31,80,180,0.16)">
+                    <span style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(60,140,255,0.45);display:block;flex:none"></span>
+                    {{ opt.label }}
+                  </button>
+                </sc-if>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isBranchStep }}">
+            <div style="font-size:17px;font-weight:800;color:#1E1A44;margin-bottom:16px">Qaysi filialimiz sizga yaqin?</div>
+            <div style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding-right:6px">
+              <sc-for list="{{ branches }}" as="opt" hint-placeholder-count="6">
+                <sc-if value="{{ opt.on }}">
+                  <button onClick="{{ opt.pick }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 17px;border-radius:999px;border:1px solid rgba(255,255,255,0.9);background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);font-size:15px;font-weight:800;color:#FFFFFF;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 8px 22px rgba(60,90,255,0.38)">
+                    <span style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;flex:none"><span style="width:7px;height:7px;border-radius:50%;background:#5151FF;display:block"></span></span>
+                    {{ opt.label }}
+                  </button>
+                </sc-if>
+                <sc-if value="{{ opt.off }}">
+                  <button onClick="{{ opt.pick }}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 17px;border-radius:999px;border:1px solid rgba(255,255,255,0.78);background:linear-gradient(140deg,rgba(255,255,255,0.62) 0%,rgba(255,255,255,0.28) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:15px;font-weight:700;color:#3B3670;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.9)" style-hover="background:rgba(255,255,255,0.86);box-shadow:inset 0 1px 1px rgba(255,255,255,1),0 8px 22px rgba(31,80,180,0.16)">
+                    <span style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(60,140,255,0.45);display:block;flex:none"></span>
+                    {{ opt.label }}
+                  </button>
+                </sc-if>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isNameStep }}">
+            <div style="font-size:17px;font-weight:800;color:#1E1A44;margin-bottom:8px">Ismingiz</div>
+            <div style="font-size:14px;color:#5B5686;margin-bottom:16px">Sizga qanday murojaat qilaylik?</div>
+            <input value="{{ name }}" onChange="{{ setName }}" placeholder="Masalan: Dilnoza" style="width:100%;padding:16px 20px;border-radius:999px;border:1px solid rgba(255,255,255,0.85);background:linear-gradient(140deg,rgba(255,255,255,0.72) 0%,rgba(255,255,255,0.4) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 2px 3px rgba(31,80,180,0.1);font-size:16px;font-weight:700;color:#1E1A44" style-focus="border-color:rgba(81,81,255,0.6);box-shadow:inset 0 2px 3px rgba(31,80,180,0.08),0 0 0 4px rgba(81,81,255,0.14)">
+          </sc-if>
+
+          <sc-if value="{{ isPhoneStep }}">
+            <div style="font-size:17px;font-weight:800;color:#1E1A44;margin-bottom:8px">Telefon raqamingiz</div>
+            <div style="font-size:14px;color:#5B5686;margin-bottom:16px">Metodistimiz qo‘ng‘iroq qilib, qulay vaqtni belgilaydi.</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:0 20px;border-radius:999px;border:1px solid rgba(255,255,255,0.85);background:linear-gradient(140deg,rgba(255,255,255,0.72) 0%,rgba(255,255,255,0.4) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 2px 3px rgba(31,80,180,0.1)">
+              <span style="font-size:16px;font-weight:800;color:#1E1A44">+998</span>
+              <input value="{{ phone }}" onChange="{{ setPhone }}" inputMode="numeric" placeholder="90 123 45 67" style="flex:1;padding:16px 0;border:none;background:transparent;font-size:16px;font-weight:700;color:#1E1A44">
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ error }}">
+            <div style="margin-top:12px;font-size:14px;font-weight:700;color:#E03535">{{ error }}</div>
+          </sc-if>
+
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px">
+            <sc-if value="{{ canGoBack }}">
+              <button onClick="{{ back }}" style="padding:16px 24px;border-radius:999px;border:1px solid rgba(255,255,255,0.85);background:linear-gradient(140deg,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.34) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:16px;font-weight:800;color:#3B3670;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.9)" style-hover="background:rgba(255,255,255,0.88)">Orqaga</button>
+            </sc-if>
+            <button onClick="{{ next }}" style="flex:1;min-width:180px;padding:17px 26px;border-radius:999px;border:1px solid rgba(255,255,255,0.6);background:linear-gradient(135deg,#28DDFF 0%,#3C8CFF 52%,#5151FF 100%);font-size:16px;font-weight:900;color:#FFFFFF;cursor:pointer;box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.65),inset 0 -2px 4px rgba(20,40,140,0.28),0 14px 34px rgba(60,90,255,0.44)" style-hover="box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.8),0 18px 40px rgba(60,90,255,0.6)">{{ nextLabel }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ done }}">
+          <div style="text-align:center;padding:6px 0 4px">
+            <img src="./assets/robbit-robot.png" alt="Robbit" style="width:118px;height:auto;display:block;margin:0 auto 14px;filter:drop-shadow(0 16px 26px rgba(31,80,180,0.26))">
+            <div style="font-size:24px;font-weight:900;letter-spacing:-0.02em;margin-bottom:10px;color:#1E1A44">Rahmat, {{ name }}!</div>
+            <div style="font-size:16px;line-height:1.6;color:#5B5686;margin-bottom:22px">Arizangiz qabul qilindi. Metodistimiz 1 ish kuni ichida <b>+998 {{ phone }}</b> raqamiga qo‘ng‘iroq qiladi va bepul sinov darsi vaqtini kelishadi.</div>
+            <div style="padding:22px;border-radius:26px;background:linear-gradient(150deg,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.34) 100%);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border:1px solid rgba(255,255,255,0.85);box-shadow:inset 0 1px 1px rgba(255,255,255,0.95);text-align:left;margin-bottom:14px">
+              <div style="font-size:15px;font-weight:900;color:#1E1A44;margin-bottom:6px">Telegram kanalimizga qo‘shiling</div>
+              <div style="font-size:14px;line-height:1.55;color:#5B5686;margin-bottom:16px">Darslar jadvali, o‘quvchilarimiz loyihalari va ota-onalar uchun foydali maslahatlar.</div>
+              <a href="{{ telegramUrl }}" target="_blank" style="display:inline-block;padding:14px 24px;border-radius:999px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;font-size:15px;font-weight:800;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 12px 28px rgba(60,90,255,0.4)" style-hover="color:#FFFFFF">Kanalga o‘tish</a>
+            </div>
+            <button onClick="{{ restart }}" style="background:none;border:none;font-size:14px;font-weight:700;color:#6F6A92;cursor:pointer;padding:6px">Yana bir ariza qoldirish</button>
+          </div>
+        </sc-if>
+      </div>
+    </div><section style="max-width:1200px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+      <div ref="{{ statsRef }}" class="rise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(45%,190px),1fr));gap:clamp(14px,2vw,22px)">
+        <div class="lift" style="border-radius:30px;padding:clamp(26px,3.4vw,38px) 22px;text-align:center;background:linear-gradient(150deg,rgba(255,255,255,0.86) 0%,rgba(255,255,255,0.52) 100%);backdrop-filter:blur(26px) saturate(185%);-webkit-backdrop-filter:blur(26px) saturate(185%);border:1px solid rgba(255,255,255,0.9);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 22px 50px rgba(31,80,180,0.16)">
+          <div style="font-size:clamp(40px,4.8vw,58px);font-weight:900;letter-spacing:-0.03em;line-height:1;background-image:linear-gradient(120deg,#0089B8 0%,#0B63D6 50%,#3A2FD1 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">{{ statBranches }}</div>
+          <div style="font-size:16px;font-weight:700;line-height:1.4;color:#25215A;margin-top:12px">Filial O‘zbekiston bo‘ylab</div>
+        </div>
+        <div class="lift" style="border-radius:30px;padding:clamp(26px,3.4vw,38px) 22px;text-align:center;background:linear-gradient(150deg,rgba(255,255,255,0.86) 0%,rgba(255,255,255,0.52) 100%);backdrop-filter:blur(26px) saturate(185%);-webkit-backdrop-filter:blur(26px) saturate(185%);border:1px solid rgba(255,255,255,0.9);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 22px 50px rgba(31,80,180,0.16)">
+          <div style="font-size:clamp(40px,4.8vw,58px);font-weight:900;letter-spacing:-0.03em;line-height:1;background-image:linear-gradient(120deg,#0089B8 0%,#0B63D6 50%,#3A2FD1 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">{{ statStudents }}</div>
+          <div style="font-size:16px;font-weight:700;line-height:1.4;color:#25215A;margin-top:12px">O‘quvchilar</div>
+        </div>
+        <div class="lift" style="border-radius:30px;padding:clamp(26px,3.4vw,38px) 22px;text-align:center;background:linear-gradient(150deg,rgba(255,255,255,0.86) 0%,rgba(255,255,255,0.52) 100%);backdrop-filter:blur(26px) saturate(185%);-webkit-backdrop-filter:blur(26px) saturate(185%);border:1px solid rgba(255,255,255,0.9);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 22px 50px rgba(31,80,180,0.16)">
+          <div style="font-size:clamp(40px,4.8vw,58px);font-weight:900;letter-spacing:-0.03em;line-height:1;background-image:linear-gradient(120deg,#0089B8 0%,#0B63D6 50%,#3A2FD1 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">{{ statYears }}</div>
+          <div style="font-size:16px;font-weight:700;line-height:1.4;color:#25215A;margin-top:12px">Yillik tajriba</div>
+        </div>
+      </div>
+    </section>
+
+    
+
+    <section style="max-width:1200px;margin:0 auto;padding:clamp(56px,8vw,88px) clamp(16px,4vw,32px) 0">
+      <div style="font-size:13px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;color:#0E86C4;margin-bottom:14px">Yo‘nalishlar</div>
+      <h2 style="margin:0 0 12px;font-size:clamp(28px,4.2vw,40px);line-height:1.12;letter-spacing:-0.03em;font-weight:900;color:#1E1A44;max-width:640px;text-wrap:pretty">Farzandingiz yoshiga mos dastur</h2>
+      <p style="margin:0 0 40px;font-size:17px;line-height:1.6;color:#4F4A7A;max-width:540px">Har bir yo‘nalish amaliyotga asoslangan: dars oxirida bola o‘z qo‘li bilan ishlaydigan natija yaratadi.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:22px">
+        <div class="lift" style="border-radius:30px;overflow:hidden;background:linear-gradient(150deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.4) 100%);backdrop-filter:blur(26px) saturate(185%);-webkit-backdrop-filter:blur(26px) saturate(185%);border:1px solid rgba(255,255,255,0.85);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 22px 50px rgba(31,80,180,0.16)">
+          <div style="height:180px;background:rgba(255,255,255,0.35)"><image-slot id="robbit-dir-1" shape="rect" placeholder="Robototexnika darsi fotosi"></image-slot></div>
+          <div style="padding:24px 24px 28px">
+            <div style="display:inline-block;padding:7px 15px;border-radius:999px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;font-size:13px;font-weight:800;margin-bottom:14px;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 8px 20px rgba(60,90,255,0.34)">9–12 yosh</div>
+            <div style="font-size:20px;font-weight:900;letter-spacing:-0.02em;margin-bottom:10px;color:#1E1A44">Robototexnika</div>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4F4A7A">Konstruktor bilan robot yig‘ish, datchiklar va motorlar bilan ishlash, birinchi algoritmlar.</p>
+          </div>
+        </div>
+        <div class="lift" style="border-radius:30px;overflow:hidden;background:linear-gradient(150deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.4) 100%);backdrop-filter:blur(26px) saturate(185%);-webkit-backdrop-filter:blur(26px) saturate(185%);border:1px solid rgba(255,255,255,0.85);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 22px 50px rgba(31,80,180,0.16)">
+          <div style="height:180px;background:rgba(255,255,255,0.35)"><image-slot id="robbit-dir-2" shape="rect" placeholder="Dasturlash darsi fotosi"></image-slot></div>
+          <div style="padding:24px 24px 28px">
+            <div style="display:inline-block;padding:7px 15px;border-radius:999px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;font-size:13px;font-weight:800;margin-bottom:14px;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 8px 20px rgba(60,90,255,0.34)">13–15 yosh</div>
+            <div style="font-size:20px;font-weight:900;letter-spacing:-0.02em;margin-bottom:10px;color:#1E1A44">Dasturlash asoslari</div>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4F4A7A">Scratch’dan Python’gacha: mantiqiy fikrlash, o‘yin va mini-ilovalar yaratish.</p>
+          </div>
+        </div>
+        <div class="lift" style="border-radius:30px;overflow:hidden;background:linear-gradient(150deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.4) 100%);backdrop-filter:blur(26px) saturate(185%);-webkit-backdrop-filter:blur(26px) saturate(185%);border:1px solid rgba(255,255,255,0.85);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 22px 50px rgba(31,80,180,0.16)">
+          <div style="height:180px;background:rgba(255,255,255,0.35)"><image-slot id="robbit-dir-3" shape="rect" placeholder="Loyiha ustida ishlash fotosi"></image-slot></div>
+          <div style="padding:24px 24px 28px">
+            <div style="display:inline-block;padding:7px 15px;border-radius:999px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;font-size:13px;font-weight:800;margin-bottom:14px;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 8px 20px rgba(60,90,255,0.34)">9-15 yosh</div>
+            <div style="font-size:20px;font-weight:900;letter-spacing:-0.02em;margin-bottom:10px;color:#1E1A44">Loyihalar va musobaqalar</div>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4F4A7A">Jamoaviy loyihalar, taqdimot ko‘nikmalari va respublika musobaqalariga tayyorgarlik.</p>
+          </div>
+        </div>
+      </div>
+    </section><section style="max-width:1200px;margin:0 auto;padding:clamp(56px,8vw,88px) clamp(16px,4vw,32px) 0">
+      <div class="rise" style="border-radius:36px;padding:clamp(30px,5vw,56px);background:linear-gradient(150deg,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.32) 100%);backdrop-filter:blur(30px) saturate(185%);-webkit-backdrop-filter:blur(30px) saturate(185%);border:1px solid rgba(255,255,255,0.82);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 24px 56px rgba(31,80,180,0.16);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(30px,4vw,52px);align-items:center">
+        <div>
+          <div style="font-size:13px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;color:#0E86C4;margin-bottom:14px">Nega Robbit?</div>
+          <h2 style="margin:0 0 16px;font-size:clamp(27px,4vw,38px);line-height:1.12;letter-spacing:-0.03em;font-weight:900;color:#1E1A44;text-wrap:pretty">Ota-onalar bizga nima uchun ishonadi</h2>
+          <p style="margin:0 0 24px;font-size:16.5px;line-height:1.65;color:#4F4A7A">Bolaning har bir qadami nazoratda: dars natijalari, davomat va o‘qituvchi izohlari sizga yetkaziladi.</p>
+          <img src="./unt_0004-1-mscv5mtz-6qu4.png" alt="Robbit" style="width: 292px; height: 280px; display: block; filter: drop-shadow(0 18px 30px rgba(31,80,180,0.24)); object-fit: fill; top: 587.11px">
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:26px 30px">
+          <div>
+            <div style="width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;margin-bottom:14px;box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.6),0 12px 26px rgba(60,90,255,0.36)">01</div>
+            <div style="font-size:17.5px;font-weight:900;color:#1E1A44;margin-bottom:8px">Kichik guruhlar</div>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4F4A7A">O‘qituvchi har bir bolaga yetarli vaqt ajratadi, hech kim ortda qolmaydi.</p>
+          </div>
+          <div>
+            <div style="width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;margin-bottom:14px;box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.6),0 12px 26px rgba(60,90,255,0.36)">02</div>
+            <div style="font-size:17.5px;font-weight:900;color:#1E1A44;margin-bottom:8px">Amaliy jihozlar</div>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4F4A7A">Zamonaviy konstruktorlar va kompyuterlar — nazariya emas, qo‘l bilan ishlash.</p>
+          </div>
+          <div>
+            <div style="width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;margin-bottom:14px;box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.6),0 12px 26px rgba(60,90,255,0.36)">03</div>
+            <div style="font-size:17.5px;font-weight:900;color:#1E1A44;margin-bottom:8px">Tajribali o‘qituvchilar</div>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4F4A7A">Muhandislik va IT sohasidan kelgan, bolalar bilan ishlash metodikasini bilgan mutaxassislar.</p>
+          </div>
+          <div>
+            <div style="width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;margin-bottom:14px;box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.6),0 12px 26px rgba(60,90,255,0.36)">04</div>
+            <div style="font-size:17.5px;font-weight:900;color:#1E1A44;margin-bottom:8px">Uyga yaqin filial</div>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4F4A7A">O‘zbekiston bo‘ylab 10 ta filialimiz bor — bolangiz uzoqqa qatnamaydi.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width:1200px;margin:0 auto;padding:clamp(56px,8vw,88px) clamp(16px,4vw,32px) 0">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:30px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:13px;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;color:#0E86C4;margin-bottom:14px">Fikrlar</div>
+          <h2 style="margin:0 0 10px;font-size:clamp(27px,4vw,38px);line-height:1.12;letter-spacing:-0.03em;font-weight:900;color:#1E1A44;max-width:560px;text-wrap:pretty">Ota-onalarning dars haqida fikrlari</h2>
+          <p style="margin:0;font-size:16.5px;line-height:1.6;color:#4F4A7A;max-width:520px">Farzandlari Robbit’da o‘qiyotgan ota-onalar bilan qisqa suhbatlar.</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ scrollPrev }}" aria-label="Orqaga" style="width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,0.85);background:linear-gradient(140deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.38) 100%);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);color:#5151FF;font-size:20px;font-weight:900;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.95),0 10px 26px rgba(31,80,180,0.16)" style-hover="background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF">‹</button>
+          <button onClick="{{ scrollNext }}" aria-label="Oldinga" style="width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,0.85);background:linear-gradient(140deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.38) 100%);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);color:#5151FF;font-size:20px;font-weight:900;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.95),0 10px 26px rgba(31,80,180,0.16)" style-hover="background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF">›</button>
+        </div>
+      </div>
+      <div ref="{{ rowRef }}" style="display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 24px;scrollbar-width:thin">
+        <sc-for list="{{ videos }}" as="v" hint-placeholder-count="4">
+          <div class="lift" style="flex:none;width:min(272px,78vw);scroll-snap-align:start;border-radius:30px;overflow:hidden;background:linear-gradient(150deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.4) 100%);backdrop-filter:blur(26px) saturate(185%);-webkit-backdrop-filter:blur(26px) saturate(185%);border:1px solid rgba(255,255,255,0.85);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 22px 50px rgba(31,80,180,0.18)">
+            <div style="position:relative;width:100%;aspect-ratio:9 / 16;background:#0B1030">
+              <sc-if value="{{ v.idle }}" hint-placeholder-val="{{ true }}">
+                <div onClick="{{ v.open }}" style="position:absolute;inset:0;cursor:pointer;background:#0B1030">
+                  <div style="{{ v.thumbStyle }}"></div>
+                  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,20,60,0) 45%,rgba(10,20,60,0.45) 100%);pointer-events:none"></div>
+                  <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-end;padding:16px;pointer-events:none">
+                    <button onClick="{{ v.open }}" aria-label="Videoni ko‘rish" style="pointer-events:auto;width:58px;height:58px;border-radius:50%;border:1px solid rgba(255,255,255,0.7);background:linear-gradient(135deg,rgba(40,221,255,0.92) 0%,rgba(81,81,255,0.92) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#FFFFFF;font-size:20px;font-weight:900;cursor:pointer;box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.7),0 14px 30px rgba(60,90,255,0.46);padding-left:4px" style-hover="box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.85),0 18px 36px rgba(60,90,255,0.62)">▶</button>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ v.playing }}">
+                <iframe src="{{ v.url }}" data-robbit-video="1" title="Ota-ona fikri" allow="autoplay; encrypted-media; picture-in-picture; web-share" allowFullScreen="{{ true }}" style="position:absolute;inset:0;width:100%;height:100%;border:none;display:block"></iframe>
+              </sc-if>
+              <sc-if value="{{ v.blocked }}">
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:linear-gradient(160deg,rgba(11,16,48,0.92) 0%,rgba(31,48,120,0.92) 100%)">
+                  <div style="font-size:15px;line-height:1.5;font-weight:700;color:rgba(255,255,255,0.9)">Video shu yerda ochilmadi</div>
+                  <a href="{{ v.watch }}" target="_blank" rel="noopener" style="padding:13px 22px;border-radius:999px;background:linear-gradient(135deg,#28DDFF 0%,#5151FF 100%);color:#FFFFFF;font-size:15px;font-weight:800;box-shadow:inset 0 1px 1px rgba(255,255,255,0.6),0 12px 28px rgba(60,90,255,0.44)" style-hover="color:#FFFFFF">YouTube’da ko‘rish</a>
+                </div>
+              </sc-if>
+            </div>
+            <div style="padding:18px 20px 22px">
+              <div style="font-size:16px;font-weight:900;color:#1E1A44;margin-bottom:4px">{{ v.title }}</div>
+              <div style="font-size:14px;font-weight:600;color:#4F4A7A">{{ v.meta }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width:1200px;margin:0 auto;padding:clamp(56px,8vw,88px) clamp(16px,4vw,32px) 0">
+      <div class="rise" style="position:relative;overflow:hidden;border-radius:36px;padding:clamp(32px,5vw,60px);background:linear-gradient(135deg,rgba(0,194,245,0.9) 0%,rgba(60,140,255,0.85) 48%,rgba(81,81,255,0.9) 100%);backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);border:1px solid rgba(255,255,255,0.55);box-shadow:inset 0 2px 2px rgba(255,255,255,0.55),inset 0 -3px 6px rgba(20,40,140,0.25),0 30px 66px rgba(31,80,180,0.32);display:flex;align-items:center;justify-content:space-between;gap:44px;flex-wrap:wrap">
+        <img src="./assets/robbit-ribbon.svg" alt="" style="position:absolute;bottom:-120px;right:-90px;width:560px;opacity:0.22;pointer-events:none">
+        <div style="position:relative;max-width:560px">
+          <h2 style="margin:0 0 14px;font-size:clamp(26px,3.8vw,36px);line-height:1.12;letter-spacing:-0.03em;font-weight:900;color:#FFFFFF;text-wrap:pretty">Birinchi darsni bepul sinab ko‘ring</h2>
+          <p style="margin:0;font-size:17px;line-height:1.6;color:rgba(255,255,255,0.92)">4 ta qisqa savolga javob bering — metodistimiz siz bilan bog‘lanadi va farzandingizga mos guruhni tanlaydi.</p>
+        </div>
+        <div style="position:relative;display:flex;flex-direction:column;gap:12px">
+          <a href="#ariza" onClick="{{ openSheet }}" style="display:inline-block;padding:18px 36px;border-radius:999px;background:linear-gradient(140deg,rgba(255,255,255,0.95) 0%,rgba(255,255,255,0.75) 100%);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.9);color:#3F3FE6;font-size:17px;font-weight:900;text-align:center;box-shadow:inset 0 1.5px 1px rgba(255,255,255,1),0 16px 34px rgba(12,30,80,0.24)" style-hover="color:#5151FF">Ro‘yxatdan o‘tish</a>
+        </div>
+      </div>
+    </section>
+
+    <footer style="max-width:1200px;margin:clamp(48px,6vw,64px) auto 0;padding:0 clamp(16px,4vw,32px) clamp(32px,5vw,56px)">
+      <div style="border-radius:34px;padding:clamp(28px,4vw,40px);background:linear-gradient(150deg,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.32) 100%);backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);border:1px solid rgba(255,255,255,0.82);box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.95),0 22px 50px rgba(31,80,180,0.14);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:32px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <img src="./assets/robbit-logo.svg" alt="Robbit" style="width:112px;height:auto;display:block">
+          <div style="font-size:14.5px;line-height:1.6;color:#4F4A7A;font-weight:600;max-width:300px">Bolalar uchun robototexnika va dasturlash markazi. O‘zbekiston bo‘ylab 10 ta filial, 2000+ o‘quvchi.</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:#0E86C4;margin-bottom:12px">Yo‘nalishlar</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <a href="#ariza" style="font-size:15px;font-weight:700;color:#25215A" style-hover="color:#5151FF">Robototexnika (9–12)</a>
+            <a href="#ariza" style="font-size:15px;font-weight:700;color:#25215A" style-hover="color:#5151FF">Dasturlash asoslari (13–15)</a>
+            <a href="#ariza" style="font-size:15px;font-weight:700;color:#25215A" style-hover="color:#5151FF">Loyihalar va musobaqalar</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:#0E86C4;margin-bottom:12px">Aloqa</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <a href="tel:+998787773777" style="font-size:18px;font-weight:900;color:#25215A" style-hover="color:#5151FF">+998 78 777 37 77</a>
+            <a href="{{ telegramUrl }}" target="_blank" style="font-size:15px;font-weight:700;color:#25215A" style-hover="color:#5151FF">Telegram</a>
+            <a href="https://instagram.com" target="_blank" style="font-size:15px;font-weight:700;color:#25215A" style-hover="color:#5151FF">Instagram</a>
+            <a href="https://robbit.uz" target="_blank" style="font-size:15px;font-weight:700;color:#25215A" style-hover="color:#5151FF">robbit.uz</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;telegramUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://t.me/robbituz&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const AGES = ['9–12 yosh', '13–15 yosh', 'Boshqa'];
+const BRANCHES = ['Toshkent shahri', 'Namangan shahar markazi', 'Andijon shahar markazi', 'Farg‘ona shahar markazi', 'Samarqand shahar markazi', 'Navoiy shahar markazi', 'Qarshi shahar markazi', 'Guliston shahar markazi', 'Urganch shahar markazi', 'Boshqa'];
+
+// Video havolalari (embed URL) — ota-onalar fikrlari
+const VIDEOS = [
+  { title: 'Ota-ona fikri', meta: 'Robbit o‘quvchisining oilasi', id: 'BVbyZOCjixs' },
+  { title: 'Ota-ona fikri', meta: 'Robbit o‘quvchisining oilasi', id: 'wZhuS8ZFwyE' },
+  { title: 'Ota-ona fikri', meta: 'Robbit o‘quvchisining oilasi', id: 'D9G2Guh-9Og' },
+  { title: 'Ota-ona fikri', meta: 'Robbit o‘quvchisining oilasi', id: 'NONlxbIVuCA' }
+].map(v => ({
+  ...v,
+  url: 'https://www.youtube-nocookie.com/embed/' + v.id + '?autoplay=1&rel=0&playsinline=1',
+  watch: 'https://youtube.com/shorts/' + v.id,
+  thumb: 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg'
+}));
+
+class Component extends DCLogic {
+  state = { step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, activeVideo: null, statP: 0, sheetOpen: false };
+  rowRef = React.createRef();
+  statsRef = React.createRef();
+
+  componentDidMount() {
+    const el = this.statsRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return this.runCounters();
+    this.io = new IntersectionObserver(entries => {
+      if (entries.some(e => e.isIntersecting)) { this.io.disconnect(); this.runCounters(); }
+    }, { threshold: 0.35 });
+    this.io.observe(el);
+  }
+
+  componentWillUnmount() {
+    if (this.io) this.io.disconnect();
+    if (this.raf) cancelAnimationFrame(this.raf);
+  }
+
+  runCounters() {
+    const t0 = performance.now(), dur = 1600;
+    const tick = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      this.setState({ statP: 1 - Math.pow(1 - p, 3) });
+      if (p < 1) this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+
+  scrollBy = dir => {
+    const el = this.rowRef.current;
+    if (el) el.scrollBy({ left: dir * 290, behavior: 'smooth' });
+  };
+
+  fmtPhone(raw) {
+    const d = raw.replace(/\D/g, '').replace(/^998/, '').slice(0, 9);
+    return [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(' ');
+  }
+
+  next = () => {
+    const { step, age, branch, name, phone } = this.state;
+    if (step === 0 && age === null) return this.setState({ error: 'Iltimos, yoshni tanlang.' });
+    if (step === 1 && branch === null) return this.setState({ error: 'Iltimos, filialni tanlang.' });
+    if (step === 2 && name.trim().length < 2) return this.setState({ error: 'Iltimos, ismingizni yozing.' });
+    if (step === 3) {
+      if (phone.replace(/\D/g, '').length < 9) return this.setState({ error: 'Telefon raqamni to‘liq kiriting.' });
+      return this.setState({ done: true, error: '' });
+    }
+    this.setState({ step: step + 1, error: '' });
+  };
+
+  back = () => this.setState(s => ({ step: Math.max(0, s.step - 1), error: '' }));
+  restart = () => this.setState({ step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false });
+
+  renderVals() {
+    const s = this.state;
+    const opts = (list, key) => list.map((label, i) => ({
+      label,
+      on: s[key] === i,
+      off: s[key] !== i,
+      pick: () => this.setState({ [key]: i, error: '' })
+    }));
+    return {
+      shellClass: s.sheetOpen ? 'quiz-shell rise open' : 'quiz-shell rise',
+      sheetOpen: s.sheetOpen,
+      openSheet: () => this.setState({ sheetOpen: true }),
+      closeSheet: () => this.setState({ sheetOpen: false }),
+      quizOpen: !s.done,
+      done: s.done,
+      stepLabel: (s.step + 1) + ' / 4',
+      progress: ((s.step + 1) / 4 * 100) + '%',
+      isAgeStep: s.step === 0,
+      isBranchStep: s.step === 1,
+      isNameStep: s.step === 2,
+      isPhoneStep: s.step === 3,
+      canGoBack: s.step > 0,
+      nextLabel: s.step === 3 ? 'Arizani yuborish' : 'Davom etish',
+      ages: opts(AGES, 'age'),
+      branches: opts(BRANCHES, 'branch'),
+      name: s.name,
+      phone: s.phone,
+      error: s.error,
+      setName: e => this.setState({ name: e.target.value, error: '' }),
+      setPhone: e => this.setState({ phone: this.fmtPhone(e.target.value), error: '' }),
+      next: this.next,
+      back: this.back,
+      restart: this.restart,
+      telegramUrl: this.props.telegramUrl ?? 'https://t.me/robbituz',
+      rowRef: this.rowRef,
+      statsRef: this.statsRef,
+      statBranches: String(Math.round(10 * s.statP)),
+      statStudents: (Math.round(2000 * s.statP / 50) * 50).toLocaleString('ru-RU').replace(/\u00A0/g, ' ') + '+',
+      statYears: String(Math.round(8 * s.statP)),
+      scrollPrev: () => this.scrollBy(-1),
+      scrollNext: () => this.scrollBy(1),
+      videos: VIDEOS.map((v, i) => ({
+        title: v.title,
+        meta: v.meta,
+        thumbStyle: { position: 'absolute', inset: 0, backgroundImage: 'url(' + v.thumb + ')', backgroundSize: 'cover', backgroundPosition: 'center' },
+        url: v.url,
+        watch: v.watch,
+        playing: s.activeVideo === i,
+        idle: s.activeVideo !== i,
+        blocked: s.activeVideo === i && s.videoBlocked,
+        slotId: 'robbit-video-' + (i + 1),
+        open: () => {
+          this.setState({ activeVideo: i, videoBlocked: false });
+          clearTimeout(this.blockTimer);
+          this.blockTimer = setTimeout(() => {
+            const f = document.querySelector('iframe[data-robbit-video]');
+            let ok = false;
+            try { ok = !!(f && f.contentWindow); } catch (e) { ok = true; }
+            if (!ok) this.setState({ videoBlocked: true });
+          }, 2500);
+        }
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "robbit-landing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ROBBIT landing page with a 4-step lead-capture quiz",
+  "scripts": {
+    "dev": "wrangler pages dev . --compatibility-date=2026-08-01",
+    "serve": "python3 -m http.server 8788",
+    "deploy": "wrangler pages deploy . --project-name=robbit-landing"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

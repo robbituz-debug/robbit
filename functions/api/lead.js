@@ -1,0 +1,263 @@
+/**
+ * POST /api/lead — quiz submission endpoint (Cloudflare Pages Function).
+ *
+ * The original landing page had no backend at all: the last quiz step only
+ * flipped a `done` flag in React state, so every lead was silently discarded.
+ * This function is that missing half.
+ *
+ * Flow: validate -> reject bots -> rate limit -> notify Telegram -> (optional)
+ * append to a KV log -> respond.
+ *
+ * Required environment variables (Pages -> Settings -> Environment variables):
+ *   TELEGRAM_BOT_TOKEN   Bot token from @BotFather
+ *   TELEGRAM_CHAT_ID     Target chat/group/channel id (e.g. -1001234567890)
+ *
+ * Optional:
+ *   LEADS                KV namespace binding; used for rate limiting and,
+ *                        when present, stores every lead as a backup.
+ *   ALLOWED_ORIGIN       Comma-separated origins allowed to POST here.
+ *                        Defaults to same-origin only.
+ */
+
+const MAX_BODY_BYTES = 4096;
+const MIN_ELAPSED_MS = 2500;        // a human needs longer than this for 4 steps
+const RATE_LIMIT_MAX = 5;           // submissions per IP
+const RATE_LIMIT_WINDOW = 3600;     // ... per hour (seconds)
+
+/* Uzbek mobile operator codes — same list as the client. */
+const UZ_CODES = new Set([
+  '20', '33', '50', '55', '61', '62', '63', '65', '66', '67',
+  '69', '70', '71', '72', '73', '74', '75', '76', '77', '78',
+  '79', '88', '90', '91', '93', '94', '95', '97', '98', '99'
+]);
+
+export async function onRequestPost(context) {
+  const { request, env } = context;
+
+  const cors = corsHeaders(request, env);
+  if (cors === null) return json({ error: 'forbidden_origin' }, 403);
+
+  /* ---------------------------------------------------------- read + parse */
+
+  const len = Number(request.headers.get('content-length') || 0);
+  if (len > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413, cors);
+
+  let body;
+  try {
+    const text = await request.text();
+    if (text.length > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413, cors);
+    body = JSON.parse(text);
+  } catch {
+    return json({ error: 'invalid_json' }, 400, cors);
+  }
+  if (!body || typeof body !== 'object') return json({ error: 'invalid_body' }, 400, cors);
+
+  /* ------------------------------------------------------------- anti-spam */
+
+  // Honeypot: the field is visually hidden, so only a bot fills it in.
+  if (typeof body.company === 'string' && body.company.trim() !== '') {
+    return json({ ok: true }, 200, cors);   // pretend success, drop silently
+  }
+
+  // Timing: a real person cannot answer four questions this fast.
+  const elapsed = Number(body.elapsedMs);
+  if (Number.isFinite(elapsed) && elapsed >= 0 && elapsed < MIN_ELAPSED_MS) {
+    return json({ ok: true }, 200, cors);
+  }
+
+  /* ------------------------------------------------------------ validation */
+
+  const name = str(body.name, 60);
+  if (name.trim().length < 2) return json({ error: 'invalid_name' }, 422, cors);
+
+  const digits = str(body.phone, 20).replace(/\D/g, '').replace(/^998/, '');
+  if (digits.length !== 9 || !UZ_CODES.has(digits.slice(0, 2))) {
+    return json({ error: 'invalid_phone' }, 422, cors);
+  }
+  const phone = '+998' + digits;
+
+  const age = str(body.age, 40);
+  const branch = str(body.branch, 80);
+  if (!age || !branch) return json({ error: 'incomplete' }, 422, cors);
+
+  /* ----------------------------------------------------------- rate limit */
+
+  const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+  if (env.LEADS) {
+    const key = `rl:${ip}`;
+    const seen = Number((await env.LEADS.get(key)) || 0);
+    if (seen >= RATE_LIMIT_MAX) return json({ error: 'rate_limited' }, 429, cors);
+    // expirationTtl restarts the window on each write; acceptable for a
+    // landing page where the goal is stopping floods, not exact accounting.
+    await env.LEADS.put(key, String(seen + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  }
+
+  /* ------------------------------------------------------------- assemble */
+
+  const cf = request.cf || {};
+  const attribution = body.attribution && typeof body.attribution === 'object' ? body.attribution : {};
+
+  const lead = {
+    receivedAt: new Date().toISOString(),
+    name: name.trim(),
+    phone,
+    age,
+    branch,
+    source: {
+      utm_source: str(attribution.utm_source, 200),
+      utm_medium: str(attribution.utm_medium, 200),
+      utm_campaign: str(attribution.utm_campaign, 200),
+      utm_content: str(attribution.utm_content, 200),
+      utm_term: str(attribution.utm_term, 200),
+      fbclid: str(attribution.fbclid, 200),
+      gclid: str(attribution.gclid, 200),
+      referrer: str(attribution.referrer, 200),
+      page: str(body.page, 300)
+    },
+    meta: {
+      ip,
+      country: str(cf.country, 8),
+      city: str(cf.city, 60),
+      ua: str(request.headers.get('user-agent'), 200)
+    }
+  };
+
+  /* -------------------------------------------------------------- deliver */
+
+  const token = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chatId) {
+    // Misconfiguration must be loud in the logs but must NOT lose the lead:
+    // persist it if KV is available, and only then report failure.
+    console.error('[lead] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID are not set');
+    await archive(env, lead, 'undelivered');
+    return json({ error: 'not_configured' }, 500, cors);
+  }
+
+  let delivered = false;
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: formatMessage(lead),
+        parse_mode: 'HTML',
+        disable_web_page_preview: true
+      })
+    });
+    delivered = res.ok;
+    if (!res.ok) {
+      console.error('[lead] telegram error', res.status, (await res.text()).slice(0, 300));
+    }
+  } catch (err) {
+    console.error('[lead] telegram request failed:', err && err.message);
+  }
+
+  await archive(env, lead, delivered ? 'delivered' : 'undelivered');
+
+  // A lead that reached KV is not lost even if Telegram was down, so only
+  // report an error when we have no copy at all.
+  if (!delivered && !env.LEADS) return json({ error: 'delivery_failed' }, 502, cors);
+
+  return json({ ok: true }, 200, cors);
+}
+
+/* Reject anything that is not a POST with a clear, cacheable answer. */
+export async function onRequest(context) {
+  if (context.request.method === 'POST') return onRequestPost(context);
+  if (context.request.method === 'OPTIONS') {
+    const cors = corsHeaders(context.request, context.env);
+    return new Response(null, { status: cors ? 204 : 403, headers: cors || {} });
+  }
+  return json({ error: 'method_not_allowed' }, 405, { Allow: 'POST, OPTIONS' });
+}
+
+/* ------------------------------------------------------------------ helpers */
+
+function str(v, max) {
+  return typeof v === 'string' ? v.slice(0, max) : '';
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+}
+
+function formatMessage(lead) {
+  const s = lead.source;
+  const utm = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content']
+    .map((k) => (s[k] ? `${k.replace('utm_', '')}: ${escapeHtml(s[k])}` : null))
+    .filter(Boolean);
+
+  const lines = [
+    '🤖 <b>Yangi ariza — Robbit</b>',
+    '',
+    `👤 <b>Ism:</b> ${escapeHtml(lead.name)}`,
+    `📞 <b>Telefon:</b> <a href="tel:${escapeHtml(lead.phone)}">${escapeHtml(lead.phone)}</a>`,
+    `🎂 <b>Yosh:</b> ${escapeHtml(lead.age)}`,
+    `📍 <b>Filial:</b> ${escapeHtml(lead.branch)}`
+  ];
+
+  if (utm.length) lines.push('', `📊 <b>Manba:</b> ${utm.join(' · ')}`);
+  else if (s.referrer) lines.push('', `📊 <b>Manba:</b> ${escapeHtml(s.referrer)}`);
+
+  const geo = [lead.meta.city, lead.meta.country].filter(Boolean).join(', ');
+  if (geo) lines.push(`🌍 ${escapeHtml(geo)}`);
+
+  lines.push('', `🕒 ${escapeHtml(tashkentTime(lead.receivedAt))}`);
+  return lines.join('\n');
+}
+
+function tashkentTime(iso) {
+  try {
+    return new Intl.DateTimeFormat('uz-UZ', {
+      timeZone: 'Asia/Tashkent', dateStyle: 'short', timeStyle: 'short'
+    }).format(new Date(iso)) + ' (Toshkent)';
+  } catch {
+    return iso;
+  }
+}
+
+async function archive(env, lead, status) {
+  if (!env.LEADS) return;
+  try {
+    const key = `lead:${lead.receivedAt}:${lead.phone}`;
+    await env.LEADS.put(key, JSON.stringify({ ...lead, status }));
+  } catch (err) {
+    console.error('[lead] KV archive failed:', err && err.message);
+  }
+}
+
+/**
+ * Same-origin by default. ALLOWED_ORIGIN widens it when the page is served
+ * from another host (e.g. a .uz mirror pointing at this API).
+ * Returns null when the origin is not allowed.
+ */
+function corsHeaders(request, env) {
+  const origin = request.headers.get('origin');
+  if (!origin) return {};                       // same-origin form post / curl
+  const self = new URL(request.url).origin;
+  const allowed = new Set([self]);
+  if (env && env.ALLOWED_ORIGIN) {
+    env.ALLOWED_ORIGIN.split(',').forEach((o) => allowed.add(o.trim()));
+  }
+  if (!allowed.has(origin)) return null;
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Vary': 'Origin'
+  };
+}
+
+function json(data, status, headers) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+      ...(headers || {})
+    }
+  });
+}

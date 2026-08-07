@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Local secrets — never commit real tokens
+.dev.vars
+.env
+.env.*
+!.env.example
+
+# Build / tooling
+.venv-build/
+.wrangler/
+dist/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Original design export (kept out of git: 30 MB of duplicated PDFs/fonts)
+_extracted/
+*.zip
