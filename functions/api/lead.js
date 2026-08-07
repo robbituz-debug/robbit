@@ -11,7 +11,7 @@
  * Required environment variables (Pages -> Settings -> Environment variables):
  *   TELEGRAM_BOT_TOKEN   Bot token from @BotFather
  *   TELEGRAM_CHAT_ID     Target chat id, or several separated by commas
- *                        (e.g. "-1001234567890" or "1977164959,1055575872").
+ *                        (e.g. "-1001234567890" or "111111111,222222222").
  *                        A lead counts as delivered if at least one succeeds.
  *                        Note: a bot can only message a user who has pressed
  *                        /start on it first; groups need the bot as a member.
