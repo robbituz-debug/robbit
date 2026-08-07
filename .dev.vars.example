@@ -2,6 +2,10 @@
 # In production set these in Cloudflare Pages -> Settings -> Environment variables.
 
 TELEGRAM_BOT_TOKEN=123456789:AAExampleTokenFromBotFather
+
+# One chat id, or several separated by commas. Every one of them gets the lead.
+# A bot can only DM a user who has pressed /start on it first; for a group,
+# add the bot to the group and use the group's (negative) id.
 TELEGRAM_CHAT_ID=-1001234567890
 
 # Optional: comma-separated extra origins allowed to POST /api/lead

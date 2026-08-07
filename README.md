@@ -145,7 +145,7 @@ preview URLs to deliver leads too):
 | Name | Required | Value |
 | --- | --- | --- |
 | `TELEGRAM_BOT_TOKEN` | yes | From [@BotFather](https://t.me/BotFather) |
-| `TELEGRAM_CHAT_ID` | yes | Target chat/group/channel id |
+| `TELEGRAM_CHAT_ID` | yes | Target chat id, or several comma-separated |
 | `ALLOWED_ORIGIN` | no | Extra origins allowed to POST, comma-separated |
 
 Mark the token as **Encrypt**.
@@ -157,6 +157,11 @@ Mark the token as **Encrypt**.
 2. Create a group for the sales team, add the bot, and send any message in it.
 3. Open `https://api.telegram.org/bot<TOKEN>/getUpdates` and read
    `result[0].message.chat.id` (group ids are negative, e.g. `-1001234567890`).
+
+**A bot cannot start a conversation.** Sending to a personal id fails with
+`Bad Request: chat not found` until that person opens the bot and presses
+**Start**. For a group, the bot must be a member. `TELEGRAM_CHAT_ID` accepts a
+comma-separated list, so several people can receive every lead.
 </details>
 
 ### 3. Optional: KV for lead backup and rate limiting

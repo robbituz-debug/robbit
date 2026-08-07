@@ -10,7 +10,11 @@
  *
  * Required environment variables (Pages -> Settings -> Environment variables):
  *   TELEGRAM_BOT_TOKEN   Bot token from @BotFather
- *   TELEGRAM_CHAT_ID     Target chat/group/channel id (e.g. -1001234567890)
+ *   TELEGRAM_CHAT_ID     Target chat id, or several separated by commas
+ *                        (e.g. "-1001234567890" or "1977164959,1055575872").
+ *                        A lead counts as delivered if at least one succeeds.
+ *                        Note: a bot can only message a user who has pressed
+ *                        /start on it first; groups need the bot as a member.
  *
  * Optional:
  *   LEADS                KV namespace binding; used for rate limiting and,
@@ -135,25 +139,34 @@ export async function onRequestPost(context) {
     return json({ error: 'not_configured' }, 500, cors);
   }
 
-  let delivered = false;
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: formatMessage(lead),
-        parse_mode: 'HTML',
-        disable_web_page_preview: true
-      })
-    });
-    delivered = res.ok;
-    if (!res.ok) {
-      console.error('[lead] telegram error', res.status, (await res.text()).slice(0, 300));
+  const text = formatMessage(lead);
+  const targets = String(chatId).split(',').map((c) => c.trim()).filter(Boolean);
+
+  // Send to every configured chat in parallel. One recipient blocking the bot
+  // (or never having pressed /start) must not hide the lead from the others.
+  const results = await Promise.all(targets.map(async (target) => {
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: target,
+          text,
+          parse_mode: 'HTML',
+          disable_web_page_preview: true
+        })
+      });
+      if (res.ok) return true;
+      console.error('[lead] telegram error for', target, res.status,
+        (await res.text()).slice(0, 300));
+      return false;
+    } catch (err) {
+      console.error('[lead] telegram request failed for', target, err && err.message);
+      return false;
     }
-  } catch (err) {
-    console.error('[lead] telegram request failed:', err && err.message);
-  }
+  }));
+
+  const delivered = results.some(Boolean);
 
   await archive(env, lead, delivered ? 'delivered' : 'undelivered');
 
