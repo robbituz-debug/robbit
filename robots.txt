@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://robbit.uz/sitemap.xml
+Sitemap: https://robbitedu.uz/sitemap.xml

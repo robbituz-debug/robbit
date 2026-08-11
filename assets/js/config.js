@@ -1,47 +1,23 @@
-/* ==========================================================================
-   ROBBIT landing — runtime configuration
-   Edit this file to change endpoints, tracking IDs and content without
-   touching the application logic. It is loaded before app.js and is not
-   minified on purpose so a non-developer can change it safely.
-   ========================================================================== */
-
+/* ROBBIT landing — runtime configuration.
+   Non-developer safe: change endpoints, links and tracking IDs here. */
 window.ROBBIT_CONFIG = {
-  /* Endpoint that receives quiz submissions.
-     Served by functions/api/lead.js (Cloudflare Pages Function). */
   leadEndpoint: '/api/lead',
-
-  /* Public links */
-  telegramUrl: 'https://t.me/robbituz',
+  telegramUrl:  'https://t.me/robbituz',
   instagramUrl: 'https://www.instagram.com/robbituz/',
   phone: '+998787773777',
   phoneDisplay: '+998 78 777 37 77',
-
-  /* Quiz options. Order matters — the index is what gets submitted. */
-  ages: ['9–12 yosh', '13–15 yosh', 'Boshqa'],
-  branches: [
-    'Toshkent shahri',
-    'Namangan shahar markazi',
-    'Andijon shahar markazi',
-    'Farg‘ona shahar markazi',
-    'Samarqand shahar markazi',
-    'Navoiy shahar markazi',
-    'Qarshi shahar markazi',
-    'Guliston shahar markazi',
-    'Urganch shahar markazi',
-    'Boshqa'
-  ],
-
-  /* Parent testimonial videos (YouTube Shorts IDs) */
-  videos: [
-    { title: 'Ota-ona fikri', meta: 'Robbit o‘quvchisining oilasi', id: 'BVbyZOCjixs' },
-    { title: 'Ota-ona fikri', meta: 'Robbit o‘quvchisining oilasi', id: 'wZhuS8ZFwyE' },
-    { title: 'Ota-ona fikri', meta: 'Robbit o‘quvchisining oilasi', id: 'D9G2Guh-9Og' },
-    { title: 'Ota-ona fikri', meta: 'Robbit o‘quvchisining oilasi', id: 'NONlxbIVuCA' }
-  ],
-
-  /* Analytics — leave empty to disable. Nothing is loaded when empty,
-     which also keeps the page cookie-free until an ID is set. */
-  metaPixelId: '',      // e.g. '1234567890123456'
-  yandexMetrikaId: '',  // e.g. '98765432'
-  gtagId: ''            // e.g. 'G-XXXXXXXXXX'
+  /* Meta Pixel — bo'sh qoldirilsa hech narsa yuklanmaydi (cookie-free). */
+  metaPixelId: '349660218140505'
 };
+
+/* Meta Pixel loader (faqat ID berilgan bo'lsa ishlaydi) */
+(function(){
+  var id = (window.ROBBIT_CONFIG && window.ROBBIT_CONFIG.metaPixelId) || '';
+  if (!id) return;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+  (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', id); fbq('track', 'PageView');
+})();
