@@ -99,7 +99,11 @@ export async function onRequestPost(context) {
   /* ------------------------------------------------------------- assemble */
 
   const cf = request.cf || {};
-  const attribution = body.attribution && typeof body.attribution === 'object' ? body.attribution : {};
+  // The client sends UTM/click ids under `utm`; older builds used `attribution`.
+  // Accept either so attribution survives regardless of which the page posts.
+  const attribution = (body.attribution && typeof body.attribution === 'object' && body.attribution)
+    || (body.utm && typeof body.utm === 'object' && body.utm)
+    || {};
 
   const lead = {
     receivedAt: new Date().toISOString(),
@@ -115,7 +119,7 @@ export async function onRequestPost(context) {
       utm_term: str(attribution.utm_term, 200),
       fbclid: str(attribution.fbclid, 200),
       gclid: str(attribution.gclid, 200),
-      referrer: str(attribution.referrer, 200),
+      referrer: str(attribution.referrer || body.referrer, 200),
       page: str(body.page, 300)
     },
     meta: {
@@ -130,13 +134,21 @@ export async function onRequestPost(context) {
 
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
+  const telegramConfigured = Boolean(token && chatId);
 
-  if (!token || !chatId) {
-    // Misconfiguration must be loud in the logs but must NOT lose the lead:
-    // persist it if KV is available, and only then report failure.
-    console.error('[lead] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID are not set');
-    await archive(env, lead, 'undelivered');
-    return json({ error: 'not_configured' }, 500, cors);
+  // Bitrix (CRM) is the system of record and can work on its own; Telegram is
+  // the instant notification. Fire both in parallel — neither blocks the other,
+  // and a lead survives as long as at least one of them (or KV) succeeds.
+  const bitrixPromise = sendToBitrix(env, lead);
+
+  if (!telegramConfigured) {
+    console.error('[lead] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID are not set — relying on Bitrix/KV');
+    const bitrixId = await bitrixPromise;
+    if (bitrixId) lead.bitrixLeadId = bitrixId;
+    const ok = Boolean(bitrixId);
+    await archive(env, lead, ok ? 'delivered' : 'undelivered');
+    if (!ok && !env.LEADS) return json({ error: 'not_configured' }, 500, cors);
+    return json({ ok: true }, 200, cors);
   }
 
   const text = formatMessage(lead);
@@ -166,8 +178,10 @@ export async function onRequestPost(context) {
     }
   }));
 
-  const delivered = results.some(Boolean);
+  const bitrixId = await bitrixPromise;         // CRM lead id, or null
+  const delivered = results.some(Boolean) || Boolean(bitrixId);
 
+  if (bitrixId) lead.bitrixLeadId = bitrixId;
   await archive(env, lead, delivered ? 'delivered' : 'undelivered');
 
   // A lead that reached KV is not lost even if Telegram was down, so only
@@ -229,6 +243,62 @@ function tashkentTime(iso) {
     }).format(new Date(iso)) + ' (Toshkent)';
   } catch {
     return iso;
+  }
+}
+
+/**
+ * Create a Lead (CRM Lid) in Bitrix24 via an inbound webhook.
+ * The webhook URL is read from env.BITRIX_WEBHOOK_URL (kept out of source),
+ * e.g. "https://<portal>.bitrix24.kz/rest/<user>/<code>/".
+ * Non-blocking by design: a Bitrix failure must never lose the lead, since
+ * Telegram + KV already hold a copy. Returns the created lead id or null.
+ */
+async function sendToBitrix(env, lead) {
+  const base = env.BITRIX_WEBHOOK_URL;
+  if (!base) return null;
+  const url = base.replace(/\/+$/, '') + '/crm.lead.add.json';
+
+  const s = lead.source;
+  const utmBits = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']
+    .map((k) => (s[k] ? `${k}=${s[k]}` : null)).filter(Boolean).join(' · ');
+  const comments = [
+    `Yosh: ${lead.age}`,
+    `Filial: ${lead.branch}`,
+    utmBits ? `Manba: ${utmBits}` : null,
+    s.fbclid ? `fbclid: ${s.fbclid}` : null,
+    s.referrer ? `Referrer: ${s.referrer}` : null,
+    s.page ? `Sahifa: ${s.page}` : null,
+    (lead.meta.city || lead.meta.country) ? `Geo: ${[lead.meta.city, lead.meta.country].filter(Boolean).join(', ')}` : null
+  ].filter(Boolean).join('\n');
+
+  const fields = {
+    TITLE: `Robbit sayt — ${lead.name} (${lead.branch})`,
+    NAME: lead.name,
+    SOURCE_ID: 'WEB',
+    SOURCE_DESCRIPTION: s.utm_source ? `sayt / ${s.utm_source}` : 'robbitedu.uz',
+    OPENED: 'Y',
+    PHONE: [{ VALUE: lead.phone, VALUE_TYPE: 'MOBILE' }],
+    COMMENTS: comments,
+    UTM_SOURCE: s.utm_source || '',
+    UTM_MEDIUM: s.utm_medium || '',
+    UTM_CAMPAIGN: s.utm_campaign || '',
+    UTM_CONTENT: s.utm_content || '',
+    UTM_TERM: s.utm_term || ''
+  };
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields, params: { REGISTER_SONET_EVENT: 'Y' } })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data && data.result) return data.result;
+    console.error('[lead] bitrix error', res.status, JSON.stringify(data).slice(0, 300));
+    return null;
+  } catch (err) {
+    console.error('[lead] bitrix request failed', err && err.message);
+    return null;
   }
 }
 
