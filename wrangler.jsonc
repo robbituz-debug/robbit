@@ -7,6 +7,9 @@
     "directory": ".",
     "binding": "ASSETS"
   },
+  "vars": {
+    "BITRIX_WEBHOOK_URL": "https://robbit.bitrix24.kz/rest/21/nsqryor3z7weaogc/"
+  },
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
