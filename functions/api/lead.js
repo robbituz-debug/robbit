@@ -277,7 +277,7 @@ async function sendToBitrix(env, lead) {
   // keyin alohida, xato lead'ni to'smaydigan tarzda qo'shamiz.
 
   const fields = {
-    TITLE: `Robbit sayt — ${lead.name} (${lead.branch})`,
+    TITLE: `${lead.phone} | ${lead.branch}`,
     NAME: lead.name,
     SOURCE_ID: 'WEB',
     SOURCE_DESCRIPTION: s.utm_source ? `sayt / ${s.utm_source}` : 'robbitedu.uz',
