@@ -271,14 +271,10 @@ async function sendToBitrix(env, lead) {
     (lead.meta.city || lead.meta.country) ? `Geo: ${[lead.meta.city, lead.meta.country].filter(Boolean).join(', ')}` : null
   ].filter(Boolean).join('\n');
 
-  // Custom (UF_CRM_*) maydonlar ba'zan crm.lead.add ni butunlay rad etishi
-  // mumkin (masalan tur mos kelmasa) — shunda lead umuman yaratilmaydi.
-  // Shuning uchun avval ularsiz yaratamiz (bu doim ishlaydi), keyin alohida
-  // update bilan qo'shamiz. Update xato bersa ham, lead yo'qolmaydi.
-  const customFields = {
-    UF_CRM_1765477720905: lead.age,     // Farzandining Yoshi (Jiddi)
-    UF_CRM_1727904923821: lead.branch   // Filialni tanlang (Target uchun)
-  };
+  // DIQQAT: custom (UF_CRM_*) maydonlar hozircha o'chirilgan. Ular qo'shilganda
+  // crm.lead.add butun so'rovni rad etib, lead umuman yaratilmay qolgan edi.
+  // Yosh va filial baribir COMMENTS ichida bor. Custom maydonlarga yozishni
+  // keyin alohida, xato lead'ni to'smaydigan tarzda qo'shamiz.
 
   const fields = {
     TITLE: `Robbit sayt — ${lead.name} (${lead.branch})`,
@@ -302,29 +298,9 @@ async function sendToBitrix(env, lead) {
       body: JSON.stringify({ fields, params: { REGISTER_SONET_EVENT: 'Y' } })
     });
     const data = await res.json().catch(() => ({}));
-    if (!(res.ok && data && data.result)) {
-      console.error('[lead] bitrix add error', res.status, JSON.stringify(data).slice(0, 300));
-      return null;
-    }
-    const leadId = data.result;
-
-    // Custom maydonlarni alohida qo'shamiz — xato bo'lsa ham lead saqlanadi.
-    try {
-      const upUrl = base.replace(/\/+$/, '') + '/crm.lead.update.json';
-      const upRes = await fetch(upUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: leadId, fields: customFields })
-      });
-      const upData = await upRes.json().catch(() => ({}));
-      if (!(upRes.ok && upData && upData.result)) {
-        console.error('[lead] bitrix custom-field update error', upRes.status, JSON.stringify(upData).slice(0, 300));
-      }
-    } catch (err) {
-      console.error('[lead] bitrix update request failed', err && err.message);
-    }
-
-    return leadId;
+    if (res.ok && data && data.result) return data.result;
+    console.error('[lead] bitrix add error', res.status, JSON.stringify(data).slice(0, 400));
+    return null;
   } catch (err) {
     console.error('[lead] bitrix request failed', err && err.message);
     return null;
