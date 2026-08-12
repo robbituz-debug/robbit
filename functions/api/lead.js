@@ -279,6 +279,9 @@ async function sendToBitrix(env, lead) {
     OPENED: 'Y',
     PHONE: [{ VALUE: lead.phone, VALUE_TYPE: 'MOBILE' }],
     COMMENTS: comments,
+    // Custom maydonlar (Bitrix'da alohida ko'rinadi)
+    UF_CRM_1765477720905: lead.age,     // Farzandining Yoshi (Jiddi)
+    UF_CRM_1727904923821: lead.branch,  // Filialni tanlang (Target uchun)
     UTM_SOURCE: s.utm_source || '',
     UTM_MEDIUM: s.utm_medium || '',
     UTM_CAMPAIGN: s.utm_campaign || '',
