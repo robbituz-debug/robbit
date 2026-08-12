@@ -1,28 +1,29 @@
 /**
- * Vaqtinchalik Worker entry (Worker Assets rejimi uchun).
- * DIQQAT: bu bosqichda /api/lead to'liq ishlamaydi — CRM/Telegram ulanishi
- * Pages Functions (functions/api/lead.js) da. To'g'ri Pages proyektga
- * o'tilgach, bu fayl kerak bo'lmaydi.
- * Hozircha forma POST qilsa, lead yo'qolmasin uchun aniq javob qaytaramiz.
+ * Worker entry — statik assetlarni beradi va /api/lead ni boshqaradi.
+ *
+ * Lead mantiqi (validatsiya, anti-spam, Bitrix CRM, Telegram) bitta manbada:
+ * functions/api/lead.js. Uni shu yerdan import qilib ishlatamiz, shunda kod
+ * takrorlanmaydi. Pages Functions "context" shaklini kutadi, shuning uchun
+ * Worker (request, env) ni o'sha shaklga o'rab uzatamiz.
  */
+import { onRequestPost, onRequest as leadOnRequest } from './functions/api/lead.js';
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
     if (url.pathname === '/api/lead') {
-      // Frontendga "qabul qilindi" ko'rinishini beramiz (foydalanuvchi rahmat
-      // ekranini ko'radi), lekin serverda log qoldiramiz. To'liq ishlashi
-      // Pages Functions ga o'tgach yoqiladi.
-      if (request.method === 'POST') {
-        return new Response(JSON.stringify({ ok: true, note: 'pending_pages_migration' }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
-        });
-      }
-      return new Response(JSON.stringify({ error: 'method_not_allowed' }), {
-        status: 405, headers: { 'Content-Type': 'application/json' }
-      });
+      // Pages Functions imzosi: onRequest({ request, env, ... })
+      const context = {
+        request,
+        env,
+        waitUntil: (p) => ctx.waitUntil(p),
+        next: () => env.ASSETS.fetch(request)
+      };
+      return leadOnRequest(context);
     }
-    // Boshqa hamma narsa — statik assetlar (dizayn)
+
+    // Boshqa hamma yo'l — statik assetlar (dizayn, rasmlar, JS, CSS)
     return env.ASSETS.fetch(request);
   }
 };
