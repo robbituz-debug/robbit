@@ -1,7 +1,20 @@
 <!DOCTYPE html>
-<html><head>
+<html data-theme="light"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  /* Temani sahifa chizilishidan oldin o'rnatamiz — miltillash bo'lmaydi.
+     Standart holat tongi (light); faqat foydalanuvchi tungi (dark) ni
+     tanlagan bo'lsa o'shani tiklaymiz. */
+  (function () {
+    try {
+      var t = localStorage.getItem('robbit-theme');
+      document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
 <script src="/assets/js/config.js"></script>
 <script src="/assets/js/react.js"></script>
 <script src="/assets/js/react-dom.js"></script>
@@ -394,14 +407,22 @@ const VIDEOS = [
 try { window.__AGES = AGES; window.__BRANCHES = BRANCHES; } catch(e){}
 
 class Component extends DCLogic {
-  state = { step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, activeVideo: null, statP: 0, sheetOpen: false };
+  state = { step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, activeVideo: null, statP: 0, sheetOpen: false, light: true };
   rowRef = React.createRef();
   statsRef = React.createRef();
 
   componentDidMount() {
     try {
       const t = localStorage.getItem('robbit-theme');
-      if (t === 'light') { document.documentElement.setAttribute('data-theme', 'light'); this.setState({ light: true }); }
+      // Standart holat — tongi (light). Faqat foydalanuvchi o'zi tungi (dark)
+      // rejimni tanlagan bo'lsa, o'shani tiklaymiz.
+      if (t === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        this.setState({ light: false });
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        this.setState({ light: true });
+      }
     } catch (e) {}
     const el = this.statsRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') return this.runCounters();
