@@ -29,6 +29,8 @@
   :root { --bg:#080C14; --bg1:#0C121D; --bg2:#080C14; --bg3:#0B1018; --g1:rgba(255,255,255,0.075); --g2:rgba(255,255,255,0.025); --line:rgba(255,255,255,0.10); --line2:rgba(255,255,255,0.14); --sh:rgba(0,0,0,0.5); --tx:#F2F6FC; --tx2:#DCE4F0; --tx3:#C6D0DE; --mut:#95A3B8; --mut2:#7D8B9F; --grid:rgba(255,255,255,0.05); --ring:rgba(255,255,255,0.28); --blobA:radial-gradient(circle,rgba(81,81,255,0.22) 0%,rgba(81,81,255,0) 62%); --blobB:radial-gradient(circle,rgba(46,96,190,0.34) 0%,rgba(46,96,190,0) 68%); --blobC:radial-gradient(circle,rgba(81,81,255,0.18) 0%,rgba(81,81,255,0) 66%); }
   html[data-theme="light"] { --bg:#F1F2F4; --bg1:#FAFAFB; --bg2:#F0F1F3; --bg3:#EAECEF; --g1:rgba(255,255,255,0.92); --g2:rgba(255,255,255,0.62); --line:rgba(255,255,255,0.9); --line2:rgba(255,255,255,1); --sh:rgba(20,28,60,0.12); --tx:#12151F; --tx2:#232838; --tx3:#3A4054; --mut:#5C6478; --mut2:#7A8296; --grid:rgba(30,38,66,0.07); --ring:rgba(81,81,255,0.35); --blobA:radial-gradient(circle,rgba(81,81,255,0.07) 0%,rgba(81,81,255,0) 62%); --blobB:radial-gradient(circle,rgba(46,96,190,0.06) 0%,rgba(46,96,190,0) 68%); --blobC:radial-gradient(circle,rgba(81,81,255,0.05) 0%,rgba(81,81,255,0) 66%); }
   html, body { margin: 0; padding: 0; background: var(--bg); }
+  input::placeholder { color: var(--mut2); opacity: 0.6; font-weight: 600; }
+  input::-webkit-input-placeholder { color: var(--mut2); opacity: 0.6; font-weight: 600; }
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
   * { box-sizing: border-box; }
   a { color: var(--tx2); text-decoration: none; }
@@ -179,9 +181,8 @@
           </sc-if>
 
           <sc-if value="{{ isNameStep }}">
-            <div style="font-size:17px;font-weight:800;color:var(--tx);margin-bottom:8px">Ismingiz</div>
-            <div style="font-size:14px;color:var(--mut);margin-bottom:16px">Sizga qanday murojaat qilaylik?</div>
-            <input value="{{ name }}" sc-camel-on-change="{{ setName }}" placeholder="Masalan: Dilnoza" style="width:100%;padding:16px 20px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(140deg,var(--g1) 0%,var(--g2) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 2px 3px var(--sh);font-size:16px;font-weight:700;color:var(--tx)" style-focus="border-color:rgba(81,81,255,0.75);box-shadow:inset 0 2px 3px var(--sh),0 0 0 4px rgba(81,81,255,0.20)">
+            <div style="font-size:17px;font-weight:800;color:var(--tx);margin-bottom:16px">Ismingiz</div>
+            <input value="{{ name }}" sc-camel-on-change="{{ setName }}" placeholder="Ismingiz" style="width:100%;padding:16px 20px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(140deg,var(--g1) 0%,var(--g2) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 2px 3px var(--sh);font-size:16px;font-weight:700;color:var(--tx)" style-focus="border-color:rgba(81,81,255,0.75);box-shadow:inset 0 2px 3px var(--sh),0 0 0 4px rgba(81,81,255,0.20)">
           </sc-if>
 
           <sc-if value="{{ isPhoneStep }}">
