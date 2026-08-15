@@ -218,6 +218,15 @@
             <button sc-camel-on-click="{{ restart }}" style="background:none;border:none;font-size:14px;font-weight:700;color:var(--mut2);cursor:pointer;padding:6px">Yana bir ariza qoldirish</button>
           </div>
         </sc-if>
+
+        <sc-if value="{{ rejected }}">
+          <div style="text-align:center;padding:14px 0 8px">
+            <div style="font-size:52px;line-height:1;margin-bottom:16px">🎓</div>
+            <div style="font-size:22px;font-weight:900;letter-spacing:-0.02em;margin-bottom:12px;color:var(--tx)">Hozirda 9–15 yoshdagi bolalar uchun qabul ochiq</div>
+            <div style="font-size:16px;line-height:1.6;color:var(--mut);margin-bottom:24px">Robbit dasturlari aynan shu yosh guruhiga mo‘ljallangan. Farzandingiz 9–15 yoshda bo‘lsa, biz uni kutib qolamiz!</div>
+            <button sc-camel-on-click="{{ restart }}" style="display:inline-block;padding:14px 28px;border-radius:999px;background:linear-gradient(135deg,#7A7AFF 0%,#5151FF 100%);color:#FFFFFF;font-size:15px;font-weight:800;border:none;cursor:pointer;box-shadow:inset 0 1px 1px var(--line),0 12px 28px rgba(81,81,255,0.4)">Ortga qaytish</button>
+          </div>
+        </sc-if>
       </div>
     </div><section style="max-width:1200px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
       <div ref="{{ statsRef }}" class="rise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(45%,190px),1fr));gap:clamp(14px,2vw,22px)">
@@ -407,7 +416,7 @@ const VIDEOS = [
 try { window.__AGES = AGES; window.__BRANCHES = BRANCHES; } catch(e){}
 
 class Component extends DCLogic {
-  state = { step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, activeVideo: null, statP: 0, sheetOpen: false, light: true };
+  state = { step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, rejected: false, activeVideo: null, statP: 0, sheetOpen: false, light: true };
   rowRef = React.createRef();
   statsRef = React.createRef();
 
@@ -494,6 +503,9 @@ class Component extends DCLogic {
   next = () => {
     const { step, age, branch, name, phone } = this.state;
     if (step === 0 && age === null) return this.setState({ error: 'Iltimos, yoshni tanlang.' });
+    // Yoshda "Boshqa" (9–15 dan tashqari) tanlansa — forma yopiladi va
+    // qabul faqat 9–15 yosh uchun ochiq ekani haqida xabar ko'rsatiladi.
+    if (step === 0 && AGES[age] === 'Boshqa') return this.setState({ rejected: true, error: '' });
     if (step === 1 && branch === null) return this.setState({ error: 'Iltimos, filialni tanlang.' });
     if (step === 2 && name.trim().length < 2) return this.setState({ error: 'Iltimos, ismingizni yozing.' });
     if (step === 3) {
@@ -512,7 +524,7 @@ class Component extends DCLogic {
   };
 
   back = () => this.setState(s => ({ step: Math.max(0, s.step - 1), error: '' }));
-  restart = () => this.setState({ step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false });
+  restart = () => this.setState({ step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, rejected: false });
 
   renderVals() {
     const s = this.state;
@@ -529,8 +541,9 @@ class Component extends DCLogic {
       sheetOpen: s.sheetOpen,
       openSheet: () => this.setState({ sheetOpen: true }),
       closeSheet: () => this.setState({ sheetOpen: false }),
-      quizOpen: !s.done,
+      quizOpen: !s.done && !s.rejected,
       done: s.done,
+      rejected: s.rejected,
       stepLabel: (s.step + 1) + ' / 4',
       progress: ((s.step + 1) / 4 * 100) + '%',
       isAgeStep: s.step === 0,
