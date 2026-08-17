@@ -191,6 +191,10 @@
               <span style="font-size:16px;font-weight:800;color:var(--tx)">+998</span>
               <input value="{{ phone }}" sc-camel-on-change="{{ setPhone }}" sc-camel-input-mode="numeric" placeholder="90 123 45 67" style="flex:1;padding:16px 0;border:none;background:transparent;font-size:16px;font-weight:700;color:var(--tx)">
             </div>
+            <div sc-camel-on-click="{{ toggleConfirm }}" style="display:flex;align-items:center;gap:12px;margin-top:16px;cursor:pointer;user-select:none">
+              <div style="{{ confirmBoxStyle }}">{{ confirmCheck }}</div>
+              <span style="font-size:15px;font-weight:700;color:var(--tx3)">Telefon raqamni tasdiqlash</span>
+            </div>
           </sc-if>
 
           <sc-if value="{{ error }}">
@@ -416,7 +420,7 @@ const VIDEOS = [
 try { window.__AGES = AGES; window.__BRANCHES = BRANCHES; } catch(e){}
 
 class Component extends DCLogic {
-  state = { step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, rejected: false, activeVideo: null, statP: 0, sheetOpen: false, light: true };
+  state = { step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, rejected: false, confirmed: false, activeVideo: null, statP: 0, sheetOpen: false, light: true };
   rowRef = React.createRef();
   statsRef = React.createRef();
 
@@ -500,8 +504,10 @@ class Component extends DCLogic {
     }).catch(function(){ /* lead UI already shown; failure is logged server-side */ });
   }
 
+  toggleConfirm = () => this.setState({ confirmed: !this.state.confirmed, error: '' });
+
   next = () => {
-    const { step, age, branch, name, phone } = this.state;
+    const { step, age, branch, name, phone, confirmed } = this.state;
     if (step === 0 && age === null) return this.setState({ error: 'Iltimos, yoshni tanlang.' });
     // Yoshda "Boshqa" (9–15 dan tashqari) tanlansa — forma yopiladi va
     // qabul faqat 9–15 yosh uchun ochiq ekani haqida xabar ko'rsatiladi.
@@ -510,6 +516,7 @@ class Component extends DCLogic {
     if (step === 2 && name.trim().length < 2) return this.setState({ error: 'Iltimos, ismingizni yozing.' });
     if (step === 3) {
       if (phone.replace(/\D/g, '').length < 9) return this.setState({ error: 'Telefon raqamni to‘liq kiriting.' });
+      if (!confirmed) return this.setState({ error: 'Iltimos, telefon raqamni tasdiqlang.' });
       this.submitLead();
       return this.setState({ done: true, error: '' });
     }
@@ -524,7 +531,7 @@ class Component extends DCLogic {
   };
 
   back = () => this.setState(s => ({ step: Math.max(0, s.step - 1), error: '' }));
-  restart = () => this.setState({ step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, rejected: false });
+  restart = () => this.setState({ step: 0, age: null, branch: null, name: '', phone: '', error: '', done: false, rejected: false, confirmed: false });
 
   renderVals() {
     const s = this.state;
@@ -562,6 +569,11 @@ class Component extends DCLogic {
       next: this.next,
       back: this.back,
       restart: this.restart,
+      toggleConfirm: this.toggleConfirm,
+      confirmCheck: s.confirmed ? '✓' : '',
+      confirmBoxStyle: 'width:24px;height:24px;flex-shrink:0;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#FFFFFF;transition:all .15s;' + (s.confirmed
+        ? 'background:linear-gradient(135deg,#7A7AFF 0%,#5151FF 100%);border:1px solid #5151FF;box-shadow:0 4px 12px rgba(81,81,255,0.4)'
+        : 'background:var(--g1);border:1.5px solid var(--line)'),
       telegramUrl: this.props.telegramUrl ?? 'https://t.me/robbituz',
       rowRef: this.rowRef,
       statsRef: this.statsRef,
