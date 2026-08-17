@@ -73,11 +73,15 @@
     .hero-copy .hero-badge { margin-left: auto; margin-right: auto; }
     .hero-checks { align-items: center; }
     .hero-checks > div { width: 100%; max-width: 100% !important; text-align: left; }
-    /* Mobilda 3 statistika yonma-yon, ixcham — chiroyli tartib */
-    .stats-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
-    .stats-grid > div { padding: 18px 8px !important; border-radius: 20px !important; }
-    .stats-grid > div > div:first-child { font-size: 28px !important; white-space: nowrap; }
-    .stats-grid > div > div:last-child { font-size: 12px !important; margin-top: 6px !important; line-height: 1.3 !important; }
+    /* Mobilda statistika: 2 ta yonma-yon, 3-chisi pastda o'rtada (tepadagilar bilan bir kenglik) */
+    .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+    .stats-grid > div { padding: 26px 14px !important; border-radius: 24px !important; }
+    .stats-grid > div:last-child { grid-column: 1 / -1; width: calc(50% - 6px); margin: 0 auto; }
+    .stats-grid > div > div:first-child { font-size: 40px !important; white-space: nowrap; }
+    .stats-grid > div > div:last-child { font-size: 14px !important; margin-top: 10px !important; line-height: 1.35 !important; }
+    /* Sarlavha ierarxiyasi: mobilda yiriroq va checklist bilan orasi kengroq */
+    .hero-copy h1 { font-size: 42px !important; line-height: 1.04 !important; margin-bottom: 34px !important; }
+    .hero-copy .hero-badge { margin-bottom: 20px !important; }
   }
   @media (max-width: 480px) { .hdr img { width: 88px !important; } .hdr-tel { padding: 10px 10px !important; } }
 </style>
