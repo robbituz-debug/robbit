@@ -509,8 +509,17 @@ class Component extends DCLogic {
       referrer: document.referrer || '',
       utm: this.collectUtm()
     };
-    // Meta Pixel Lead event (if pixel configured on page)
-    try { if (window.fbq) window.fbq('track', 'Lead'); } catch (e) {}
+    // Meta Pixel Lead event — foydalanuvchi telefoni bilan (advanced matching).
+    // fbq init'da autoConfig yoqilgan; bu yerda telefonni aniq uzatamiz.
+    try {
+      if (window.fbq) {
+        var digits = payload.phone.replace(/\D/g, '');
+        window.fbq('track', 'Lead', {}, { eventID: 'lead_' + Date.now() });
+        // Telefonni init advanced matching sifatida qayta yuboramiz
+        var pid = (window.ROBBIT_CONFIG && window.ROBBIT_CONFIG.metaPixelId) || '';
+        if (pid) window.fbq('init', pid, { ph: digits });
+      }
+    } catch (e) {}
     fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
