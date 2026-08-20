@@ -1,169 +1,78 @@
 <!DOCTYPE html>
-<html lang="uz" data-theme="light"><head>
+<html><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Robbit — Bepul sinov darsiga yoziling</title>
-<meta name="description" content="Robbit — bolalar uchun robototexnika va dasturlash. Qo‘ng‘iroq qiling, bepul sinov darsiga yozing.">
-<link rel="icon" href="/assets/img/icon-192.png">
-<meta property="og:title" content="Robbit — Bepul sinov darsi">
-<meta property="og:description" content="Bir marta qo‘ng‘iroq — farzandingiz uchun bepul sinov darsi.">
-<meta property="og:type" content="website">
-<style>
-  @font-face {
-    font-family: 'Plus Jakarta Sans';
-    src: url("/assets/fonts/PlusJakartaSans.ttf") format('truetype-variations');
-    font-weight: 200 900; font-style: normal; font-display: swap;
-  }
-  :root {
-    --bg:#F1F2F4; --panel:#FFFFFF;
-    --tx:#0C1220; --tx2:#2A3346; --mut:#5C6880;
-    --line:rgba(12,18,32,0.10);
-    --brand:#5151FF; --brand2:#7A7AFF;
-    --g1:rgba(255,255,255,0.9); --g2:rgba(255,255,255,0.55);
-    --sh:rgba(12,18,32,0.10);
-    --blobA:radial-gradient(circle, rgba(81,81,255,0.16) 0%, rgba(81,81,255,0) 62%);
-    --blobB:radial-gradient(circle, rgba(46,96,190,0.14) 0%, rgba(46,96,190,0) 68%);
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; background: var(--bg); }
-  body {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    color: var(--tx); min-height: 100vh; overflow-x: hidden;
-    display: flex; flex-direction: column;
-  }
-  /* Ambient aurora */
-  .aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
-    background: linear-gradient(165deg, #EEF0F4 0%, #F1F2F4 55%, #E9EBF2 100%); }
-  .blob { position: absolute; border-radius: 50%; filter: blur(8px); }
-  .b1 { width: 620px; height: 620px; background: var(--blobA); top: -220px; right: -160px; animation: drift 22s ease-in-out infinite; }
-  .b2 { width: 560px; height: 560px; background: var(--blobB); bottom: -200px; left: -140px; animation: drift 26s ease-in-out infinite reverse; }
-  @keyframes drift { 0%,100% { transform: translate(0,0); } 50% { transform: translate(40px,30px); } }
-  .grid { position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image: linear-gradient(rgba(12,18,32,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(12,18,32,0.04) 1px, transparent 1px);
-    background-size: 46px 46px; mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%); }
-
-  .wrap { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column;
-    max-width: 720px; margin: 0 auto; width: 100%; padding: 22px clamp(18px,5vw,28px) 40px; }
-
-  /* Header */
-  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: auto; }
-  .logo { height: 34px; }
-  .badge { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px;
-    background: linear-gradient(140deg, var(--g1), var(--g2)); border: 1px solid var(--line);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 6px 18px var(--sh);
-    font-size: 13px; font-weight: 800; color: var(--tx2); }
-  .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px rgba(81,81,255,0.15); }
-
-  /* Hero — the call is the thesis */
-  .hero { text-align: center; padding: 44px 0 0; }
-  .eyebrow { font-size: 14px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--brand); margin-bottom: 18px; }
-  h1 { font-size: clamp(30px, 8vw, 46px); line-height: 1.06; font-weight: 800; letter-spacing: -0.03em;
-    margin: 0 0 16px; color: var(--tx); }
-  .sub { font-size: clamp(16px, 4.4vw, 19px); line-height: 1.5; color: var(--mut); font-weight: 600;
-    max-width: 460px; margin: 0 auto 40px; }
-
-  /* THE call button — signature element */
-  .call {
-    display: flex; align-items: center; justify-content: center; gap: 14px;
-    width: 100%; max-width: 460px; margin: 0 auto; padding: 24px 28px;
-    border-radius: 999px; text-decoration: none;
-    background: linear-gradient(135deg, var(--brand2) 0%, var(--brand) 100%);
-    color: #FFFFFF; font-size: clamp(19px, 5vw, 23px); font-weight: 800; letter-spacing: -0.01em;
-    box-shadow: 0 18px 40px rgba(81,81,255,0.42), inset 0 1px 1px rgba(255,255,255,0.3);
-    position: relative; transition: transform .12s ease, box-shadow .12s ease;
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-  .call:active { transform: scale(0.975); }
-  .call .ico { width: 30px; height: 30px; flex-shrink: 0; }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 18px 40px rgba(81,81,255,0.42), inset 0 1px 1px rgba(255,255,255,0.3), 0 0 0 0 rgba(81,81,255,0.32); }
-    50% { box-shadow: 0 18px 40px rgba(81,81,255,0.42), inset 0 1px 1px rgba(255,255,255,0.3), 0 0 0 16px rgba(81,81,255,0); }
-  }
-  .callnum { text-align: center; margin-top: 16px; font-size: 15px; font-weight: 700; color: var(--mut); }
-  .callnum b { color: var(--tx); font-weight: 800; letter-spacing: 0.01em; }
-
-  /* Reasons to call */
-  .reasons { display: grid; gap: 12px; margin: 46px auto 0; max-width: 500px; width: 100%; }
-  .reason { display: flex; align-items: center; gap: 15px; padding: 18px 20px; border-radius: 20px;
-    background: linear-gradient(140deg, var(--g1), var(--g2)); border: 1px solid var(--line);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 8px 22px var(--sh); }
-  .reason .rico { width: 46px; height: 46px; flex-shrink: 0; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, rgba(122,122,255,0.16), rgba(81,81,255,0.10));
-    border: 1px solid rgba(81,81,255,0.18); }
-  .reason .rico svg { width: 24px; height: 24px; stroke: var(--brand); }
-  .reason .rtx { font-size: 16px; font-weight: 800; color: var(--tx); line-height: 1.3; }
-  .reason .rtx span { display: block; font-size: 13.5px; font-weight: 600; color: var(--mut); margin-top: 3px; }
-
-  /* Trust strip */
-  .trust { display: flex; justify-content: center; gap: clamp(18px,6vw,44px); margin: 46px auto 0; }
-  .trust div { text-align: center; }
-  .trust .n { font-size: clamp(26px,7vw,34px); font-weight: 800; color: var(--brand); letter-spacing: -0.02em; line-height: 1; }
-  .trust .l { font-size: 13px; font-weight: 700; color: var(--mut); margin-top: 6px; }
-
-  /* Secondary call at the bottom */
-  .foot { margin-top: 46px; text-align: center; }
-  .foot .call { animation: none; }
-
-  @media (min-width: 640px) {
-    .reasons { grid-template-columns: 1fr; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .call { animation: none; }
-    .blob { animation: none; }
-  }
-</style>
+<script src="/call/assets/js/react.js"></script>
+<script src="/call/assets/js/react-dom.js"></script>
+<script src="/call/assets/js/dc-runtime.js"></script>
 </head>
 <body>
-  <div class="aurora"><div class="blob b1"></div><div class="blob b2"></div></div>
-  <div class="grid"></div>
 
-  <div class="wrap">
-    <header>
-      <img class="logo" src="/assets/img/robbit-logo.svg" alt="Robbit">
-      <div class="badge"><span class="dot"></span> 8 yil · 2000+ o‘quvchi</div>
-    </header>
 
-    <div class="hero">
-      <div class="eyebrow">Bepul sinov darsi</div>
-      <h1>Farzandingizni robototexnikaga yozing</h1>
-      <p class="sub">Bir marta qo‘ng‘iroq qiling — metodistimiz sizga qulay vaqtni tanlab, bepul sinov darsiga yozib qo‘yadi.</p>
+<x-dc>
+<helmet>
+<style>
+  @font-face { font-family: 'Plus Jakarta Sans'; src: url("/call/assets/fonts/PlusJakartaSans.ttf") format('truetype-variations'); font-weight: 200 900; font-style: normal; font-display: swap; }
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #060912; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; }
+  a { color: #FFFFFF; text-decoration: none; }
+  a:hover { color: #FFFFFF; }
+  @keyframes robbitCallGlow { 0%,100% { box-shadow: inset 0 1.5px 1px rgba(255,255,255,0.35), 0 16px 40px rgba(81,81,255,0.5), 0 0 0 0 rgba(81,81,255,0.5); } 50% { box-shadow: inset 0 1.5px 1px rgba(255,255,255,0.35), 0 16px 40px rgba(81,81,255,0.5), 0 0 0 18px rgba(81,81,255,0); } }
+  @keyframes robbitSlowZoom { 0%,100% { transform: scale(1.04); } 50% { transform: scale(1.12); } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  @media (max-width: 560px) {
+    #robbit-cta { width: 100%; flex-wrap: wrap; justify-content: center; row-gap: 2px; padding-right: 16px; }
+    #robbit-cta .cta-div { display: none; }
+    #robbit-cta .cta-num { flex-basis: 100%; text-align: center; font-size: 15px; opacity: 0.92; }
+  }
+</style>
+</helmet>
 
-      <a class="call" href="tel:+998787773777" id="callBtn">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        Qo‘ng‘iroq qilish
-      </a>
-      <div class="callnum">Yoki o‘zingiz qo‘ng‘iroq qiling: <b>+998 78 777 37 77</b></div>
-    </div>
+<div style="position:relative;width:100%;height:100dvh;min-height:100dvh;overflow:hidden;background:#060912;color:#FFFFFF">
 
-    <div class="reasons">
-      <div class="reason">
-        <div class="rico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
-        <div class="rtx">Birinchi dars — mutlaqo bepul<span>Farzandingiz sinab ko‘radi, keyin qaror qilasiz</span></div>
-      </div>
-      <div class="reason">
-        <div class="rico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-        <div class="rtx">Tez orada bog‘lanamiz<span>Qo‘ng‘iroqdan so‘ng qulay vaqtni belgilaymiz</span></div>
-      </div>
-      <div class="reason">
-        <div class="rico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-        <div class="rtx">O‘zbekiston bo‘ylab 9 ta filial<span>Sizga eng yaqin filialni tanlaymiz</span></div>
-      </div>
-    </div>
+  <img src="/call/assets/img/pic.webp" alt="Robbit darsi" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 42%;animation:robbitSlowZoom 30s ease-in-out infinite">
 
-    <div class="trust">
-      <div><div class="n">9</div><div class="l">Filial</div></div>
-      <div><div class="n">2000+</div><div class="l">O‘quvchi</div></div>
-      <div><div class="n">8</div><div class="l">Yil tajriba</div></div>
-    </div>
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,9,18,0.62) 0%,rgba(6,9,18,0.18) 30%,rgba(6,9,18,0.55) 62%,rgba(6,9,18,0.92) 100%)"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(96deg,rgba(6,9,18,0.7) 0%,rgba(6,9,18,0.28) 42%,rgba(6,9,18,0) 72%)"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(circle at 18% 88%,rgba(81,81,255,0.28) 0%,rgba(81,81,255,0) 55%)"></div>
+  <div style="position:absolute;inset:0;background:#060912;opacity:{{ overlayOpacity }};mix-blend-mode:multiply;pointer-events:none"></div>
 
-    <div class="foot">
-      <a class="call" href="tel:+998787773777" id="callBtn2">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        Hoziroq qo‘ng‘iroq qilish
+  <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(20px,3.2vw,40px) clamp(22px,4vw,64px) clamp(28px,4.4vw,60px)">
+
+    <img src="/call/assets/img/logo.svg" alt="Robbit" style="width:clamp(104px,10vw,150px);height:auto;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,0.55))">
+
+    <div style="display:flex;flex-direction:column;align-items:{{ alignItems }};text-align:{{ textAlign }};gap:clamp(20px,2.6vw,30px);max-width:900px">
+
+      <h1 style="margin:0;font-size:clamp(34px,5.4vw,68px);line-height:1.04;letter-spacing:-0.035em;font-weight:800;text-wrap:pretty;text-shadow:0 4px 30px rgba(0,0,0,0.55)">Farg'ona shahridagi eng katta o'quv markaz</h1>
+
+      <a href="tel:+998787773777" id="robbit-cta" style="display:inline-flex;align-items:center;gap:clamp(8px,1.4vw,18px);align-self:{{ alignSelf }};padding:clamp(9px,1.2vw,16px) clamp(16px,2vw,30px) clamp(9px,1.2vw,16px) clamp(9px,1.1vw,15px);border-radius:999px;background:linear-gradient(135deg,#7A7AFF 0%,#5151FF 52%,#3A2FD1 100%);border:1px solid rgba(255,255,255,0.22);color:#FFFFFF;animation:{{ ctaAnimation }};box-shadow:inset 0 1.5px 1px rgba(255,255,255,0.35),0 16px 40px rgba(81,81,255,0.5);transition:transform .18s cubic-bezier(.2,.9,.25,1)" style-hover="transform:translateY(-2px)" style-active="transform:scale(0.98)">
+        <span style="width:clamp(38px,3.4vw,46px);height:clamp(38px,3.4vw,46px);flex:none;border-radius:50%;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.28);display:flex;align-items:center;justify-content:center">
+          <svg sc-camel-view-box="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:52%;height:52%;display:block"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        </span>
+        <span style="font-size:clamp(15px,1.5vw,21px);font-weight:800;letter-spacing:-0.01em;white-space:nowrap">Hoziroq qo'ng'iroq qiling</span>
+        <span class="cta-div" style="width:1px;height:clamp(20px,1.8vw,26px);background:rgba(255,255,255,0.35);flex:none"></span>
+        <span class="cta-num" style="font-size:clamp(15px,1.5vw,21px);font-weight:800;letter-spacing:0.01em;white-space:nowrap">+998 78 777 37 77</span>
       </a>
     </div>
   </div>
-</body>
-</html>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;overlayOpacity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.14,&quot;min&quot;:0,&quot;max&quot;:0.6,&quot;step&quot;:0.02,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Fon&quot;},&quot;align&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;left&quot;,&quot;center&quot;],&quot;default&quot;:&quot;left&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Joylashuv&quot;},&quot;pulseCta&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Tugma&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const align = this.props.align ?? 'left';
+    const centered = align === 'center';
+    return {
+      overlayOpacity: this.props.overlayOpacity ?? 0.14,
+      alignItems: centered ? 'center' : 'flex-start',
+      textAlign: centered ? 'center' : 'left',
+      alignSelf: centered ? 'center' : 'flex-start',
+      ctaAnimation: (this.props.pulseCta ?? true) ? 'robbitCallGlow 2.6s ease-in-out infinite' : 'none'
+    };
+  }
+}
+</script>
+
+
+</body></html>
