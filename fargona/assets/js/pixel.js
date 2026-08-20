@@ -7,8 +7,9 @@
   (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
   fbq('init','349660218140505', {}, { autoConfig: true });
   fbq('track','PageView');
+  // Call tugmasi bosilganda Contact eventi (qo'ng'iroq = aloqa)
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a[href^="tel:"]');
-    if (a && window.fbq) { try { fbq('track','Lead'); } catch(_){} }
+    if (a && window.fbq) { try { fbq('track','Contact'); } catch(_){} }
   }, true);
 })();
