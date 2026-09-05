@@ -50,8 +50,12 @@ export async function onRequestPost(context) {
   }
   const phone = '+998' + digits;
 
-  const token = env.AHMAD_BOT_TOKEN;
-  const chatId = env.AHMAD_CHAT_ID;
+  // Env birinchi o'rinda. Env sozlanmagan bo'lsa quyidagi qiymatlar ishlatiladi.
+  // DIQQAT: repo ochiq, shuning uchun bu token vaqtinchalik. Dashboard'ga
+  // AHMAD_BOT_TOKEN / AHMAD_CHAT_ID qo'shilgach, tokenni @BotFather'da
+  // yangilash (/revoke) tavsiya etiladi.
+  const token = env.AHMAD_BOT_TOKEN || '8974365368:AAEsNGzpHiggkISSNcas8blwkZ77MuGtCho';
+  const chatId = env.AHMAD_CHAT_ID || '1977164959';
   if (!token || !chatId) {
     console.error('[ahmad] AHMAD_BOT_TOKEN / AHMAD_CHAT_ID sozlanmagan');
     return json({ error: 'not_configured' }, 500);
