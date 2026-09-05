@@ -798,9 +798,35 @@ class Component extends DCLogic {
           this.setState({ note: "Telefon raqamini to'liq kiriting: +998 90 123 45 67" });
           return;
         }
-        const msg = encodeURIComponent("Salom Axmad! Men " + name + ". Aloqa: " + contact + "." + (budget ? " Oylik byudjet: " + budget + "." : ""));
-        window.open("https://t.me/ahmad_xoldarov?text=" + msg, "_blank");
-        this.setState({ note: "Rahmat, " + name + "! Telegram oynasi ochildi." });
+        // 1) Ariza botga yuboriladi. keepalive — sahifa darhol Telegram'ga
+        //    o'tsa ham so'rov uzilmaydi va xabar baribir yetib boradi.
+        var utm = {};
+        try {
+          var q = new URLSearchParams(window.location.search);
+          ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid"].forEach(function(k){
+            var v = q.get(k); if (v) utm[k] = v;
+          });
+        } catch (err) {}
+
+        try {
+          fetch("/api/ahmad", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: name,
+              contact: contact,
+              budget: budget,
+              company: "",
+              page: window.location.href,
+              referrer: document.referrer || "",
+              utm: utm
+            }),
+            keepalive: true
+          }).catch(function(){});
+        } catch (err) {}
+
+        // 2) Mijoz darhol Telegram suhbatiga o'tadi.
+        window.location.href = "https://t.me/m/CIVFuzDIYTJi";
       }
     };
   }
